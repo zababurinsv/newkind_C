@@ -36,7 +36,7 @@
 
 struct ship_face missile_face[] = 
 {
-	//fins
+	/* fins */
 	{GFX_COL_RED,  0x20, 0x00, 0x00, 3,  5, 9, 15, 0, 0, 0, 0, 0},
 	{GFX_COL_RED,  0x00, 0x20, 0x00, 3, 15, 9,  5, 0, 0, 0, 0, 0},
 
@@ -49,19 +49,19 @@ struct ship_face missile_face[] =
 	{GFX_COL_RED,  0x20, 0x00, 0x00, 3, 6, 10, 16, 0, 0, 0, 0, 0},
 	{GFX_COL_RED,  0x00,-0x20, 0x00, 3, 16, 10, 6, 0, 0, 0, 0, 0},
 
-	//nose cone
+	/* nose cone */
 	{GFX_COL_DARK_RED, -0x40, 0x00, 0x10, 3, 0,  3,  4, 0, 0, 0, 0, 0},
 	{GFX_COL_RED,       0x00,-0x40, 0x10, 3, 0,  4,  1, 0, 0, 0, 0, 0},
 	{GFX_COL_DARK_RED,  0x40, 0x00, 0x10, 3, 0,  1,  2, 0, 0, 0, 0, 0},
 	{GFX_COL_RED,       0x00, 0x40, 0x10, 3, 0,  2,  3, 0, 0, 0, 0, 0},
 
-	//main body
+	/* main body */
 	{GFX_COL_GREY_3,  0x20, 0x00, 0x00, 4, 6,  5,  2, 1, 0, 0, 0, 0},
 	{GFX_COL_GREY_1,  0x00, 0x20, 0x00, 4, 5,  8,  3, 2, 0, 0, 0, 0},
 	{GFX_COL_GREY_3, -0x20, 0x00, 0x00, 4, 8,  7,  4, 3, 0, 0, 0, 0},
 	{GFX_COL_GREY_1,  0x00,-0x20, 0x00, 4, 7,  6,  1, 4, 0, 0, 0, 0},
 
-	//bottom
+	/* bottom */
 	{GFX_COL_GREY_2,  0x00, 0x00,-0xB0, 4, 5,  6,  7, 8, 0, 0, 0, 0},
 };
 

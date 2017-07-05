@@ -703,7 +703,7 @@ void draw_planet (struct univ_object *planet)
 	y *= GFX_SCALE;
 	
 	radius = 6291456 / planet->distance;
-//	radius = 6291456 / ship_vec.z;   /* Planets are BIG! */
+	/* radius = 6291456 / ship_vec.z; */	/* Planets are BIG! */
 
 	radius *= GFX_SCALE;
 
@@ -805,7 +805,7 @@ void render_sun (int xo, int yo, int radius)
 	x = radius;
 	y = 0;
 
-	// s -= x + x;
+	/* s -= x + x; */
 	while (y <= x)
 	{
 		render_sun_line (xo, yo, x, y, radius);
@@ -971,9 +971,9 @@ void draw_explosion (struct univ_object *univ)
 
 	pr = (univ->exp_delta * 256) / q;
 	
-//	if (pr > 0x1C00)
-//		q = 254;
-//	else
+/*	if (pr > 0x1C00)	*/
+/*		q = 254;	*/
+/*	else			*/
 
 	q = pr / 32;	
 		

@@ -172,7 +172,7 @@ void gfx_release_screen (void)
 
 void gfx_fast_plot_pixel (int x, int y, int col)
 {
-//	_putpixel(gfx_screen, x, y, col);
+	/* _putpixel(gfx_screen, x, y, col); */
 	gfx_screen->line[y][x] = col;
 }
 
@@ -220,7 +220,7 @@ void gfx_draw_aa_circle(int cx, int cy, int radius)
 
 	while (y <= x)
 	{
-		//wide pixels
+		/* wide pixels */
 		sx = cx + (x >> AA_BITS); sy = cy + (y >> AA_BITS);
 
 		plot(sx,	sy,	AA_AND - (x&AA_AND));
@@ -241,7 +241,7 @@ void gfx_draw_aa_circle(int cx, int cy, int radius)
 		plot(sx,	sy,	AA_AND - (x&AA_AND));
 		plot(sx - 1,	sy,	x&AA_AND);
 
-		//tall pixels
+		/* tall pixels */
 		sx = cx + (y >> AA_BITS); sy = cy + (x >> AA_BITS);
 
 		plot(sx,	sy,	AA_AND - (x&AA_AND));
@@ -307,7 +307,7 @@ void gfx_draw_aa_line (int x1, int y1, int x2, int y2)
 
 		grad = fdiv(yd, xd);
 
-		//end point 1
+		/* end point 1 */
 
 		xend = trunc(x1 + 32768);
 		yend = y1 + fmul(grad, xend-x1);
@@ -325,7 +325,7 @@ void gfx_draw_aa_line (int x1, int y1, int x2, int y2)
 
 		yf = yend+grad;
 
-		//end point 2;
+		/* end point 2; */
 
 		xend = trunc(x2 + 32768);
 		yend = y2 + fmul(grad, xend-x2);
@@ -364,7 +364,7 @@ void gfx_draw_aa_line (int x1, int y1, int x2, int y2)
 
 		grad = fdiv(xd, yd);
 
-		//end point 1
+		/* end point 1 */
 
 		yend = trunc(y1 + 32768);
 		xend = x1 + fmul(grad, yend-y1);
@@ -382,7 +382,7 @@ void gfx_draw_aa_line (int x1, int y1, int x2, int y2)
 
 		xf = xend+grad;
 
-		//end point 2;
+		/* end point 2; */
 
 		yend = trunc(y2 + 32768);
 		xend = x2 + fmul(grad, yend-y2);

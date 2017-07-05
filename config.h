@@ -41,7 +41,7 @@
  */
 
 #define RES_800_600
-// #define RES_512_512
+/* #define RES_512_512 */
 
 /*
  * #define RES_640_480

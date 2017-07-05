@@ -1351,7 +1351,7 @@ void info_message (char *message)
 {
 	strcpy (message_string, message);
 	message_count = 37;
-//	snd_play_sample (SND_BEEP);
+	/* snd_play_sample (SND_BEEP); */
 }
 
 

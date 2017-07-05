@@ -235,7 +235,7 @@ int is_docking (int sn)
 	if (universe[sn].flags & FLG_ANGRY)
 	  return (0);
 
-	if (auto_pilot)		// Don't want it to kill anyone!
+	if (auto_pilot)		/* Don't want it to kill anyone! */
 		return 1;
 	
 	fz = universe[sn].rotmat[2].z;
@@ -455,7 +455,7 @@ void make_station_appear (void)
 	sy = py - vec.y * 65792;
 	sz = pz - vec.z * 65792;
 
-//	set_init_matrix (rotmat);
+	/* set_init_matrix (rotmat); */
 	
 	rotmat[0].x = 1.0;
 	rotmat[0].y = 0.0;
@@ -633,7 +633,7 @@ void update_universe (void)
 			{
 				if ((ship_count[SHIP_CORIOLIS] == 0) &&
 					(ship_count[SHIP_DODEC] == 0) &&
-					(universe[i].distance < 65792)) // was 49152
+					(universe[i].distance < 65792)) /* was 49152 */
 				{
 					make_station_appear();
 				}				

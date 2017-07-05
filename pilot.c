@@ -249,7 +249,7 @@ void auto_pilot_ship (struct univ_object *ship)
 
 	if (dist < 160)
 	{
-		ship->flags |= FLG_REMOVE;		// Ship has docked.
+		ship->flags |= FLG_REMOVE;		/* Ship has docked. */
 		return;
 	}	
 	

@@ -53,40 +53,40 @@ int ship_count[NO_OF_SHIPS + 1];  /* many */
 
 int initial_flags[NO_OF_SHIPS + 1] =
 {
-	0,											// NULL,
-	FLG_TARGET,									// missile 
-	0,											// coriolis
-	FLG_SLOW | FLG_FLY_TO_PLANET,				// escape
-	FLG_INACTIVE | FLG_TARGET,					// alloy
-	FLG_INACTIVE | FLG_TARGET,					// cargo
-	FLG_INACTIVE | FLG_TARGET,					// boulder
-	FLG_INACTIVE | FLG_TARGET,					// asteroid
-	FLG_INACTIVE | FLG_TARGET,					// rock
-	FLG_FLY_TO_PLANET | FLG_SLOW,				// shuttle
-	FLG_FLY_TO_PLANET | FLG_SLOW,				// transporter
-	0,											// cobra3
-	0,											// python
-	0,											// boa
-	FLG_SLOW,									// anaconda
-	FLG_SLOW,									// hermit
-	FLG_BOLD | FLG_POLICE,						// viper
-	FLG_BOLD | FLG_ANGRY | FLG_TARGET,			// sidewinder
-	FLG_BOLD | FLG_ANGRY | FLG_TARGET,			// mamba
-	FLG_BOLD | FLG_ANGRY | FLG_TARGET,			// krait
-	FLG_BOLD | FLG_ANGRY | FLG_TARGET,			// adder
-	FLG_BOLD | FLG_ANGRY | FLG_TARGET,			// gecko
-	FLG_BOLD | FLG_ANGRY | FLG_TARGET,			// cobra1
-	FLG_SLOW | FLG_ANGRY | FLG_TARGET,			// worm
-	FLG_BOLD | FLG_ANGRY | FLG_TARGET,			// cobra3
-	FLG_BOLD | FLG_ANGRY | FLG_TARGET,			// asp2
-	FLG_BOLD | FLG_ANGRY | FLG_TARGET,			// python
-	FLG_POLICE,								    // fer_de_lance
-	FLG_BOLD | FLG_ANGRY | FLG_TARGET,			// moray
-	FLG_BOLD | FLG_ANGRY | FLG_TARGET,			// thargoid
-	FLG_ANGRY | FLG_TARGET,						// thargon
-	FLG_ANGRY,									// constrictor
-	FLG_POLICE | FLG_CLOAKED,					// cougar
-	0											// dodec
+	0,							/* NULL, */
+	FLG_TARGET,						/* missile */
+	0,							/* coriolis */
+	FLG_SLOW | FLG_FLY_TO_PLANET,				/* escape */
+	FLG_INACTIVE | FLG_TARGET,				/* alloy */
+	FLG_INACTIVE | FLG_TARGET,				/* cargo */
+	FLG_INACTIVE | FLG_TARGET,				/* boulder */
+	FLG_INACTIVE | FLG_TARGET,				/* asteroid */
+	FLG_INACTIVE | FLG_TARGET,				/* rock */
+	FLG_FLY_TO_PLANET | FLG_SLOW,				/* shuttle */
+	FLG_FLY_TO_PLANET | FLG_SLOW,				/* transporter */
+	0,							/* cobra3 */
+	0,							/* python */
+	0,							/* boa */
+	FLG_SLOW,						/* anaconda */
+	FLG_SLOW,						/* hermit */
+	FLG_BOLD | FLG_POLICE,					/* viper */
+	FLG_BOLD | FLG_ANGRY | FLG_TARGET,			/* sidewinder */
+	FLG_BOLD | FLG_ANGRY | FLG_TARGET,			/* mamba */
+	FLG_BOLD | FLG_ANGRY | FLG_TARGET,			/* krait */
+	FLG_BOLD | FLG_ANGRY | FLG_TARGET,			/* adder */
+	FLG_BOLD | FLG_ANGRY | FLG_TARGET,			/* gecko */
+	FLG_BOLD | FLG_ANGRY | FLG_TARGET,			/* cobra1 */
+	FLG_SLOW | FLG_ANGRY | FLG_TARGET,			/* worm */
+	FLG_BOLD | FLG_ANGRY | FLG_TARGET,			/* cobra3 */
+	FLG_BOLD | FLG_ANGRY | FLG_TARGET,			/* asp2 */
+	FLG_BOLD | FLG_ANGRY | FLG_TARGET,			/* python */
+	FLG_POLICE,						/* fer_de_lance */
+	FLG_BOLD | FLG_ANGRY | FLG_TARGET,			/* moray */
+	FLG_BOLD | FLG_ANGRY | FLG_TARGET,			/* thargoid */
+	FLG_ANGRY | FLG_TARGET,					/* thargon */
+	FLG_ANGRY,						/* constrictor */
+	FLG_POLICE | FLG_CLOAKED,				/* cougar */
+	0							/* dodec */
 };
 
 
@@ -823,7 +823,7 @@ void tactics (int un)
 			track_object (&universe[un], direction, nvec);
 		}
 
-//		if ((fabs(ship->location.z) < 768) && (ship->bravery <= ((rand255() & 127) | 64)))
+		/* if ((fabs(ship->location.z) < 768) && (ship->bravery <= ((rand255() & 127) | 64))) */
 		if (fabs(ship->location.z) < 768)
 		{
 			ship->rotx = rand255() & 0x87;
@@ -1027,7 +1027,7 @@ void create_cougar (void)
 	newship = create_other_ship (SHIP_COUGAR);
 	if (newship != -1)
 	{
-		universe[newship].flags = FLG_HAS_ECM; // | FLG_CLOAKED;
+		universe[newship].flags = FLG_HAS_ECM; /* | FLG_CLOAKED; */
 		universe[newship].bravery = 121;
 		universe[newship].velocity = 18;
 	}	
@@ -1085,7 +1085,7 @@ void create_lone_hunter (void)
 
 	if (newship != -1)
 	{
-		// universe[newship].flags = FLG_ANGRY;
+		/* universe[newship].flags = FLG_ANGRY; */
 		if ((rand255() > 200) || (type == SHIP_CONSTRICTOR))
 			universe[newship].flags |= FLG_HAS_ECM;
 		
@@ -1127,7 +1127,7 @@ void check_for_asteroids (void)
 	
 	if (newship != -1)
 	{
-//		universe[newship].velocity = (rand255() & 31) | 16; 
+		/* universe[newship].velocity = (rand255() & 31) | 16; */
 		universe[newship].velocity = 8;
 		universe[newship].rotz = rand255() > 127 ? -127 : 127; 
 		universe[newship].rotx = 16; 

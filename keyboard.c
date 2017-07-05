@@ -66,7 +66,7 @@ char old_key[KEY_MAX];
 
 int kbd_keyboard_startup (void)
 {
-//	set_keyboard_rate(2000, 2000);
+	/* set_keyboard_rate(2000, 2000); */
 	return 0;
 }
 

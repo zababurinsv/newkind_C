@@ -1,13 +1,9 @@
 DEPFILE	= newkind.depend
-
 CC	= gcc
-
-SRCS = alg_gfx.c alg_main.c docked.c elite.c intro.c planet.c shipdata.c shipface.c sound.c space.c swat.c threed.c vector.c random.c trade.c options.c stars.c missions.c pilot.c file.c keyboard.c
-OBJS = $(SRCS:.c=.o)
-
-CFLAGS = -Ofast --fast-math -Wall -g $(shell allegro-config --cflags)
-LIBS = $(shell allegro-config --libs)
-
+SRCS	= alg_gfx.c alg_main.c docked.c elite.c intro.c planet.c shipdata.c shipface.c sound.c space.c swat.c threed.c vector.c random.c trade.c options.c stars.c missions.c pilot.c file.c keyboard.c
+OBJS	= $(SRCS:.c=.o)
+CFLAGS	= -std=c90 -pipe -Ofast -ffast-math -fno-common -falign-functions=16 -falign-loops=16 -Wall -g $(shell allegro-config --cflags)
+LIBS	= -g $(shell allegro-config --libs)
 EXE	= newkind
 
 all:
