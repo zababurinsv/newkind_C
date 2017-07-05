@@ -38,6 +38,34 @@ static unsigned char landscape[LAND_X_MAX+1][LAND_Y_MAX+1];
 
 static struct point point_list[100];
 
+#ifdef HACKING
+
+static void identify_ship(struct univ_object *univ)
+{
+  char buf[64];
+  int lasv;
+
+  lasv = ship_list[univ->type]->front_laser;
+  if (!(univ->flags & FLG_TACTICAL)) {
+    unsigned flags = univ->flags;
+    sprintf(buf, "%s %s%s%s%s", ship_list[univ->type]->name,
+	    (flags & FLG_ANGRY) ? "A" : "",
+	    (flags & FLG_TARGET) ? "T" : "",
+	    (flags & FLG_HOSTILE) ? "H" : "",
+	    (flags & FLG_POLICE) ? "P" : "");
+  } else {
+    unsigned flags = univ->flags;
+    sprintf(buf, "%s (%d) %s%s%s%s", ship_list[univ->type]->name,
+	    univ->energy,
+	    (flags & FLG_ANGRY) ? "A" : "",
+	    (flags & FLG_TARGET) ? "T" : "",
+	    (flags & FLG_HOSTILE) ? "H" : "",
+	    (flags & FLG_POLICE) ? "P" : "");
+  }
+  gfx_display_text(point_list[lasv].x + 4, point_list[lasv].y + 4, buf);
+}
+
+#endif
 
 /*
  * The following routine is used to draw a wireframe represtation of a ship.
@@ -154,6 +182,11 @@ void draw_wireframe_ship (struct univ_object *univ)
 		gfx_draw_line (point_list[lasv].x, point_list[lasv].y,
 					   univ->location.x > 0 ? 0 : 511, rand255() * 2);
 	}
+
+#ifdef HACKING
+	if (identify)
+	  identify_ship(univ);
+#endif
 }
 
 
@@ -331,6 +364,24 @@ void draw_solid_ship (struct univ_object *univ)
 						 univ->location.x > 0 ? 0 : 511, rand255() * 2,
 						 point_list[lasv].z, col);
 	}
+
+#if 0
+	{
+	  double cx = univ->location.x;
+	  double cy = univ->location.y;
+	  double cz = univ->location.z;
+	  if (cz <= 0) cz = 1;
+	  cx = (cx * 256) / cz + 128;
+	  cy = -(cy * 256) / cz + 96;
+	  gfx_draw_circle(cx * GFX_SCALE, cy * GFX_SCALE, sqrt(ship_list[univ->type]->size) * 256 /
+			  cz * GFX_SCALE, GFX_COL_RED);
+	}
+#endif
+
+#ifdef HACKING
+	if (identify)
+	  identify_ship(univ);
+#endif
 }
 
 

@@ -40,7 +40,7 @@
 #define SCR_GAME_OVER		19
 #define SCR_SETTINGS		20
 #define SCR_ESCAPE_POD		21
-
+#define SCR_RESTART             22
 
 #define PULSE_LASER		0x0F
 #define BEAM_LASER		0x8F
@@ -62,7 +62,8 @@
 #define FLG_SLOW			(2048)
 #define FLG_BOLD			(4096)
 #define FLG_POLICE			(8192)
-
+#define FLG_TACTICAL			(16384)
+#define FLG_TARGET			(32768)
 
 #define MAX_UNIV_OBJECTS	20
 
@@ -142,6 +143,14 @@ extern int scanner_cx;
 extern int scanner_cy;
 extern int compass_centre_x;
 extern int compass_centre_y;
+extern int prefer_window;
+extern int condition_x, condition_y, condition_r;
+extern int zoom_x, zoom_y;
+
+extern int condition;
+enum {
+  COND_DOCKED, COND_GREEN, COND_YELLOW, COND_RED, COND_ALERT
+};
 
 extern int planet_render_style;
 
@@ -159,7 +168,11 @@ extern int mcount;
 extern int detonate_bomb;
 extern int witchspace;
 extern int auto_pilot;
-
+#ifdef HACKING
+extern int identify;
+#endif
+extern int remap_keys;
+extern int scanner_zoom;
 
 void restore_saved_commander (void);
 
