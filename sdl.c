@@ -33,8 +33,12 @@ volatile int frame_count;
 //DATAFILE *datafile;
 //BITMAP *scanner_image;
 SDL_Surface *scanner_surface;
+SDL_Texture *sdl_tex = NULL;
 SDL_Window *sdl_win = NULL;
 SDL_Renderer *sdl_ren = NULL;
+
+static SDL_Rect scanner_rect;
+static SDL_Texture *scanner_texture;
 
 #define MAX_POLYS	100
 
@@ -79,8 +83,11 @@ END_OF_FUNCTION(frame_timer);
 #define putpixel(ren,x,y,c)			pixelRGBA(sdl_ren,x,y,RGBA_PARAM(c))
 #define triangle(ren,x1,y1,x2,y2,x3,y3,c)	filledTrigonRGBA(sdl_ren,x1,y1,x2,y2,x3,y3,RGBA_PARAM(c))
 
-#define textout(g,font,str,x,y,c)		fprintf(stderr,"FIXME: no string function (textout) for displaying string \"%s\"\n",str)
-#define textout_centre(g,font,str,x,y,c)	fprintf(stderr,"FIXME: no string function (textout_centre) for displaying string \"%s\"\n",str)
+// #define textout(g,font,str,x,y,c)		fprintf(stderr,"FIXME: no string function (textout) for displaying string \"%s\" at pos %d,%d\n",str,x,y)
+// #define textout_centre(g,font,str,x,y,c)	fprintf(stderr,"FIXME: no string function (textout_centre) for displaying string \"%s\" at pos %d,%d\n",str,x,y)
+
+#define textout(g,font,str,x,y,c)		stringRGBA(sdl_ren,x,y,str,RGBA_PARAM(c))
+#define textout_centre(g,font,str,x,y,c)	stringRGBA(sdl_ren,x-strlen(str)*4,y,str,RGBA_PARAM(c))
 
 
 Uint8 the_palette_r[0x100];
@@ -196,6 +203,7 @@ int gfx_graphics_startup (void)
 		ERROR_WINDOW("Cannot create renderer: %s", SDL_GetError());
 		return 1;
 	}
+	SDL_RenderSetLogicalSize(sdl_ren, SCREEN_W, SCREEN_H);
 	SDL_PixelFormat *pixfmt = SDL_AllocFormat(PIXEL_FORMAT);
 	if (!pixfmt) {
 		ERROR_WINDOW("Cannot allocate pixel format: %s", SDL_GetError());
@@ -219,18 +227,29 @@ int gfx_graphics_startup (void)
 		return 1;
 	}
 #endif
+	sdl_tex = SDL_CreateTexture(sdl_ren, PIXEL_FORMAT, SDL_TEXTUREACCESS_TARGET /*| SDL_TEXTUREACCESS_STREAMING */, SCREEN_W, SCREEN_H);
+	if (!sdl_tex) {
+		ERROR_WINDOW("Cannot create texture: %s", SDL_GetError());
+		return 1;
+	}
+	if (SDL_SetRenderTarget(sdl_ren, sdl_tex)) {
+		ERROR_WINDOW("Cannot set render target: %s", SDL_GetError());
+		return 1;
+	}
+	SDL_SetRenderDrawColor(sdl_ren, 0,0,0,0xFF);
+	SDL_RenderClear(sdl_ren);
 	scanner_surface = SDL_LoadBMP(scanner_filename);
 	if (!scanner_surface) {
 		ERROR_WINDOW("Cannot load scanner: %s", SDL_GetError());
 		return 1;
 	}
-	for (int a = 0; a < 255; a++) {
+	for (int a = 0; a < 0x100; a++) {
 		the_palette_r[a] = scanner_surface->format->palette->colors[a].r;
 		the_palette_g[a] = scanner_surface->format->palette->colors[a].g;
 		the_palette_b[a] = scanner_surface->format->palette->colors[a].b;
 		the_palette32[a] = SDL_MapRGBA(pixfmt, the_palette_r[a], the_palette_g[a], the_palette_b[a], 0xFF);
 	}
-	SDL_Texture *scanner_texture = SDL_CreateTextureFromSurface(sdl_ren, scanner_surface);
+	scanner_texture = SDL_CreateTextureFromSurface(sdl_ren, scanner_surface);
 
 	/* select the scanner palette */
 	//set_palette(the_palette);
@@ -242,6 +261,12 @@ int gfx_graphics_startup (void)
 	//clear (gfx_screen);
 
 	//blit (scanner_image, gfx_screen, 0, 0, GFX_X_OFFSET, 385+GFX_Y_OFFSET, scanner_image->w, scanner_image->h);
+	scanner_rect.x = GFX_X_OFFSET;
+	scanner_rect.y = 385+GFX_Y_OFFSET;
+	//scanner_rect.w = scanner_texture->width;
+	//scanner_rect.h = scanner_texture->height;
+	SDL_QueryTexture(scanner_texture,NULL,NULL,&scanner_rect.w,&scanner_rect.h);
+	SDL_RenderCopy(sdl_ren, scanner_texture, NULL, &scanner_rect);
 	gfx_draw_line (0, 0, 0, 384);
 	gfx_draw_line (0, 0, 511, 0);
 	gfx_draw_line (511, 0, 511, 384);
@@ -286,10 +311,18 @@ void gfx_update_screen (void)
 #endif
 	// TODO FIXME: add frame rate controll here?
 	puts("gfx_update_screen() is called!");
-	SDL_RenderPresent(sdl_ren);
-	SDL_Delay(speed_cap);
+	//SDL_RenderSetLogicalSize(sdl_ren, SCREEN_W, SCREEN_H);
+	SDL_SetRenderTarget(sdl_ren, NULL);
 	SDL_SetRenderDrawColor(sdl_ren,0,0,0,0xFF);
 	SDL_RenderClear(sdl_ren);
+	SDL_RenderCopy(sdl_ren, sdl_tex, NULL, NULL);
+	SDL_RenderPresent(sdl_ren);
+	//handle_sdl_events();
+	SDL_SetRenderTarget(sdl_ren, sdl_tex);
+	//SDL_SetRenderDrawColor(sdl_ren,0,0,0,0xFF);
+	//SDL_RenderClear(sdl_ren);
+	SDL_Delay(speed_cap);
+
 }
 
 
@@ -313,6 +346,7 @@ void gfx_fast_plot_pixel (int x, int y, int col)
 	//gfx_screen->line[y][x] = col;
 	// FIXME really, it should be "FAST"?
 	putpixel(whatever, x, y, col);
+
 }
 
 
@@ -744,7 +778,8 @@ static ETNK_INLINE void set_clip ( int x1, int y1, int x2, int y2 )
 
 void gfx_draw_scanner (void)
 {
-	fprintf(stderr, "FIXME: gfx_draw_scanner() is not implemented :(\n");
+	//fprintf(stderr, "FIXME: gfx_draw_scanner() is not implemented :(\n");
+	SDL_RenderCopy(sdl_ren, scanner_texture, NULL, &scanner_rect);
 #if 0
 	set_clip(/*gfx_screen,*/ GFX_X_OFFSET, 385 + GFX_Y_OFFSET,
 		 GFX_X_OFFSET + scanner_image->w,
@@ -1082,6 +1117,7 @@ void handle_sdl_events ( void )
 				);
 				if (!event.key.repeat) {
 					int game_code = decode_keysym(event.key.keysym.sym);
+					//printf("KEY_MAP=%d\n", game_code);
 					if (game_code >= 0) {
 						if (event.key.state == SDL_PRESSED) {
 							key[game_code] = 1;
@@ -1089,7 +1125,9 @@ void handle_sdl_events ( void )
 						} else {
 							key[game_code] = 0;
 						}
-					}
+					} /*else {
+						puts("KEY IS NOT MAPPED");
+					} */
 				}
 				break;
 		}
