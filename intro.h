@@ -12,8 +12,8 @@
  *
  */
 
-#ifndef INTRO_H
-#define INTRO_H
+#ifndef ETNK_INTRO_H
+#define ETNK_INTRO_H
 
 void initialise_intro1 (void);
 void initialise_intro2 (void);

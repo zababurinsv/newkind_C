@@ -16,10 +16,11 @@
  * trade.c
  */
 
+#include "etnk.h"
+
 #include <stdlib.h>
- 
-#include "config.h"
-#include "gfx.h"
+
+#include "sdl.h"
 #include "elite.h"
 #include "trade.h"
 #include "docked.h"
@@ -189,4 +190,3 @@ void scoop_item (int un)
 	explode_object (un);
 	damage_ship (universe[un].energy / 2, universe[un].location.z > 0);
 }
-

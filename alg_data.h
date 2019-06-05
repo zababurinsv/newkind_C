@@ -17,4 +17,3 @@
 #define REDDOT                           11       /* BMP  */
 #define SAFE                             12       /* BMP  */
 #define THEME                            13       /* MIDI */
-

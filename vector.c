@@ -19,10 +19,11 @@
  * I have, therefore, written a new set of routines which use floating point math.
  */
 
+#include "etnk.h"
+
 #include <stdlib.h>
 #include <math.h>
 
-#include "config.h"
 #include "vector.h"
 
 
@@ -173,4 +174,3 @@ void tidy_matrix (struct vector *mat)
 	mat[0].y = mat[1].z * mat[2].x - mat[1].x * mat[2].z;
 	mat[0].z = mat[1].x * mat[2].y - mat[1].y * mat[2].x;
 }
-

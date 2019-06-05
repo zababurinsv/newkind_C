@@ -24,13 +24,13 @@
  * I have split it out to make it more understandable and easier to maintain.
  */
   
-  
+#include "etnk.h"
+
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "config.h"
-#include "gfx.h"
+#include "sdl.h"
 #include "elite.h"
 #include "vector.h"
 #include "main.h"

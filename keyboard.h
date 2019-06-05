@@ -15,8 +15,14 @@
  * Code to handle keyboard input.
  */
 
-#ifndef KEYBOARD_H
-#define KEYBOARD_H
+#ifndef ETNK_KEYBOARD_H
+#define ETNK_KEYBOARD_H
+
+#define KEY_MAX 128
+extern char key[KEY_MAX];
+extern int  sdl_last_pressed_key;
+
+extern int readkey ( void );
  
 extern int kbd_F1_pressed;
 extern int kbd_F2_pressed;
@@ -69,4 +75,3 @@ int kbd_read_key (void);
 void kbd_clear_key_buffer (void);
 
 #endif
- 

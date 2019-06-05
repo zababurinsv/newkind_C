@@ -12,12 +12,13 @@
  *
  */
 
+#include "etnk.h"
+
 #include <stdlib.h>
 #include <math.h>
 
-#include "config.h"
 #include "elite.h" 
-#include "gfx.h"
+#include "sdl.h"
 #include "vector.h"
 #include "stars.h"
 #include "random.h"

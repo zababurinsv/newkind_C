@@ -12,8 +12,8 @@
  */
 
 
-#ifndef VECTOR_H
-#define VECTOR_H
+#ifndef ETNK_VECTOR_H
+#define ETNK_VECTOR_H
 
 struct vector
 {
@@ -33,4 +33,3 @@ void set_init_matrix (struct vector *mat);
 void tidy_matrix (struct vector *mat);
 
 #endif
-

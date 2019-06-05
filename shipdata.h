@@ -12,8 +12,8 @@
  */
 
 
-#ifndef SHIPDATA_H
-#define SHIPDATA_H
+#ifndef ETNK_SHIPDATA_H
+#define ETNK_SHIPDATA_H
 
 #include "vector.h"
 
@@ -156,4 +156,3 @@ extern struct ship_data dodec_data;
 
 
 #endif
-

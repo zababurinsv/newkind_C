@@ -23,8 +23,8 @@
  **/
 
 
-#ifndef GFX_H
-#define GFX_H
+#ifndef ETNK_SDL_H
+#define ETNK_SDL_H
 
 #ifdef RES_512_512
 
@@ -77,7 +77,7 @@
 #define GFX_COL_DARK_RED	28
 #define GFX_COL_WHITE		255
 #define GFX_COL_GOLD		39
-#define GFX_COL_RED			49
+#define GFX_COL_RED		49
 #define GFX_COL_CYAN		11
 
 #define GFX_COL_GREY_1		248
@@ -112,45 +112,50 @@
 #define GFX_COL_PINK_1		183
 
 #define IMG_GREEN_DOT		1
-#define IMG_RED_DOT			2
-#define IMG_BIG_S			3
+#define IMG_RED_DOT		2
+#define IMG_BIG_S		3
 #define IMG_ELITE_TXT		4
-#define IMG_BIG_E			5
-#define IMG_DICE			6
+#define IMG_BIG_E		5
+#define IMG_DICE		6
 #define IMG_MISSILE_GREEN	7
 #define IMG_MISSILE_YELLOW	8
 #define IMG_MISSILE_RED		9
-#define IMG_BLAKE			10
+#define IMG_BLAKE		10
 
 
-int gfx_graphics_startup (void);
-void gfx_graphics_shutdown (void);
-void gfx_update_screen (void);
-void gfx_acquire_screen (void);
-void gfx_release_screen (void);
-void gfx_plot_pixel (int x, int y, int col);
-void gfx_fast_plot_pixel (int x, int y, int col);
-void gfx_draw_filled_circle (int cx, int cy, int radius, int circle_colour);
-void gfx_draw_circle (int cx, int cy, int radius, int circle_colour);
-void gfx_draw_line (int x1, int y1, int x2, int y2);
-void gfx_draw_colour_line (int x1, int y1, int x2, int y2, int line_colour);
-void gfx_draw_triangle (int x1, int y1, int x2, int y2, int x3, int y3, int col);
-void gfx_draw_rectangle (int tx, int ty, int bx, int by, int col);
-void gfx_display_text (int x, int y, char *txt);
-void gfx_display_colour_text (int x, int y, char *txt, int col);
-void gfx_display_centre_text (int y, char *str, int psize, int col);
-void gfx_clear_display (void);
-void gfx_clear_text_area (void);
-void gfx_clear_area (int tx, int ty, int bx, int by);
-void gfx_display_pretty_text (int tx, int ty, int bx, int by, char *txt);
-void gfx_draw_scanner (void);
-void gfx_set_clip_region (int tx, int ty, int bx, int by);
-void gfx_polygon (int num_points, int *poly_list, int face_colour);
-void gfx_draw_sprite (int sprite_no, int x, int y);
-void gfx_start_render (void);
-void gfx_render_polygon (int num_points, int *point_list, int face_colour, int zavg);
-void gfx_render_line (int x1, int y1, int x2, int y2, int dist, int col);
-void gfx_finish_render (void);
-int gfx_request_file (char *title, char *path, char *ext);
+extern int  sdl_last_key_pressed;
+
+extern int  init_sdl ( void );
+extern void handle_sdl_events ( void );
+
+extern int  gfx_graphics_startup (void);
+extern void gfx_graphics_shutdown (void);
+extern void gfx_update_screen (void);
+extern void gfx_acquire_screen (void);
+extern void gfx_release_screen (void);
+extern void gfx_plot_pixel (int x, int y, int col);
+extern void gfx_fast_plot_pixel (int x, int y, int col);
+extern void gfx_draw_filled_circle (int cx, int cy, int radius, int circle_colour);
+extern void gfx_draw_circle (int cx, int cy, int radius, int circle_colour);
+extern void gfx_draw_line (int x1, int y1, int x2, int y2);
+extern void gfx_draw_colour_line (int x1, int y1, int x2, int y2, int line_colour);
+extern void gfx_draw_triangle (int x1, int y1, int x2, int y2, int x3, int y3, int col);
+extern void gfx_draw_rectangle (int tx, int ty, int bx, int by, int col);
+extern void gfx_display_text (int x, int y, char *txt);
+extern void gfx_display_colour_text (int x, int y, char *txt, int col);
+extern void gfx_display_centre_text (int y, char *str, int psize, int col);
+extern void gfx_clear_display (void);
+extern void gfx_clear_text_area (void);
+extern void gfx_clear_area (int tx, int ty, int bx, int by);
+extern void gfx_display_pretty_text (int tx, int ty, int bx, int by, char *txt);
+extern void gfx_draw_scanner (void);
+extern void gfx_set_clip_region (int tx, int ty, int bx, int by);
+extern void gfx_polygon (int num_points, int *poly_list, int face_colour);
+extern void gfx_draw_sprite (int sprite_no, int x, int y);
+extern void gfx_start_render (void);
+extern void gfx_render_polygon (int num_points, int *point_list, int face_colour, int zavg);
+extern void gfx_render_line (int x1, int y1, int x2, int y2, int dist, int col);
+extern void gfx_finish_render (void);
+extern int  gfx_request_file (char *title, char *path, char *ext);
 
 #endif

@@ -16,16 +16,20 @@
  * sound.c
  */
 
+#include "etnk.h"
+
 #include <stdlib.h>
-#include <allegro.h>
 #include "sound.h"
 #include "alg_data.h" 
 
 #define NUM_SAMPLES 14 
 
-extern DATAFILE *datafile;
+//extern DATAFILE *datafile;
 
 static int sound_on;
+
+// FIXME
+#define SAMPLE void
 
 struct sound_sample
 {
@@ -56,6 +60,7 @@ struct sound_sample sample_list[NUM_SAMPLES] =
  
 void snd_sound_startup (void)
 {
+#if 0
 	int i;
 
  	/* Install a sound driver.. */
@@ -73,11 +78,13 @@ void snd_sound_startup (void)
 	{
 		sample_list[i].sample = load_sample(sample_list[i].filename);
 	}
+#endif
 }
  
 
 void snd_sound_shutdown (void)
 {
+#if 0
 	int i;
 
 	if (!sound_on)
@@ -91,11 +98,14 @@ void snd_sound_shutdown (void)
 			sample_list[i].sample = NULL;
 		}
 	}
+#endif
 }
 
 
 void snd_play_sample (int sample_no)
 {
+	puts("FIXME: snd_play_sample() not implemented");
+#if 0
 	if (!sound_on)
 		return;
 
@@ -105,11 +115,13 @@ void snd_play_sample (int sample_no)
 	sample_list[sample_no].timeleft = sample_list[sample_no].runtime;
 		
 	play_sample (sample_list[sample_no].sample, 255, 128, 1000, FALSE);
+#endif
 }
 
 
 void snd_update_sound (void)
 {
+#if 0
 	int i;
 	
 	for (i = 0; i < NUM_SAMPLES; i++)
@@ -117,11 +129,14 @@ void snd_update_sound (void)
 		if (sample_list[i].timeleft > 0)
 			sample_list[i].timeleft--;
 	}
+#endif
 }
 
 
 void snd_play_midi (int midi_no, int repeat)
 {
+	puts("FIXME: snd_play_midi() not implemented");
+#if 0
 	if (!sound_on)
 		return;
 	
@@ -135,11 +150,15 @@ void snd_play_midi (int midi_no, int repeat)
 			play_midi (datafile[DANUBE].dat, repeat);
 			break;
 	}
+#endif
 }
 
 
 void snd_stop_midi (void)
 {
+	puts("FIXME: snd_stop_midi() not implemented");
+#if 0
 	if (sound_on)
 		play_midi (NULL, TRUE);
+#endif
 }

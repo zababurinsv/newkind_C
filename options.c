@@ -16,12 +16,13 @@
  * Options.c
  */
 
+#include "etnk.h"
+
 #include <stdlib.h>
 #include <string.h>
 
 #include "elite.h"
-#include "config.h"
-#include "gfx.h"
+#include "sdl.h"
 #include "options.h"
 #include "main.h"
 #include "docked.h"

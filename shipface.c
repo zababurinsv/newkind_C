@@ -24,12 +24,13 @@
  * Adapted further for clockwise vertex lists.
  */ 
 
+#include "etnk.h"
+
 #include <stdlib.h>
 
-#include "config.h"
 #include "elite.h"
 #include "shipface.h"
-#include "gfx.h"
+#include "sdl.h"
 
 
 
@@ -704,4 +705,3 @@ struct ship_solid ship_solids[] =
 	{12, cougar_face},
 	{13, dodec_face},
 };
-

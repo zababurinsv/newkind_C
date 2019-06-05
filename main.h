@@ -12,8 +12,8 @@
  *
  */
 
-#ifndef MAIN_H
-#define MAIN_H
+#ifndef ETNK_MAIN_H
+#define ETNK_MAIN_H
 
 void info_message (char *message);
 void save_commander_screen (void);

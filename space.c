@@ -18,6 +18,8 @@
  * This module handles all the flight system and management of the space universe.
  */
 
+#include "etnk.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
@@ -27,10 +29,9 @@
 
 #include "alg_data.h"
 
-#include "config.h"
 #include "elite.h"
 #include "keyboard.h"
-#include "gfx.h"
+#include "sdl.h"
 #include "docked.h"
 #include "intro.h"
 #include "shipdata.h"

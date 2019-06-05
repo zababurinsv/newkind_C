@@ -4,4 +4,10 @@ a.out
 *.o
 *.exe
 *.depend
+*.pyc
+*.pyo
 newkind
+newkind.exe
+unpack/
+test.c
+.vscode/

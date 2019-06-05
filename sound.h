@@ -16,8 +16,8 @@
  * sound.h
  */
  
-#ifndef SOUND_H
-#define SOUND_H
+#ifndef ETNK_SOUND_H
+#define ETNK_SOUND_H
 
 #define SND_LAUNCH		0
 #define SND_CRASH		1

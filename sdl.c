@@ -12,28 +12,36 @@
  *
  **/
 
+#include "etnk.h"
+
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
 #include <ctype.h>
 
-#include "allegro.h"
+#include <SDL.h>
+#include "SDL2_gfxPrimitives.h"
 
-#include "config.h"
-#include "gfx.h"
+#include "sdl.h"
 #include "alg_data.h"
 #include "elite.h"
+#include "keyboard.h"
 
-BITMAP *gfx_screen;
+//BITMAP *gfx_screen;
 volatile int frame_count;
-DATAFILE *datafile;
-BITMAP *scanner_image;
+//DATAFILE *datafile;
+//BITMAP *scanner_image;
+SDL_Surface *scanner_surface;
+SDL_Window *sdl_win = NULL;
+SDL_Renderer *sdl_ren = NULL;
 
 #define MAX_POLYS	100
 
 static int start_poly;
 static int total_polys;
+
+int have_joystick;
 
 struct poly_data
 {
@@ -47,26 +55,113 @@ struct poly_data
 static struct poly_data poly_chain[MAX_POLYS];
 
 
+#define PIXEL_FORMAT SDL_PIXELFORMAT_ARGB8888
 
 
+#if 0
 void frame_timer (void)
 {
 	frame_count++;
 }
 END_OF_FUNCTION(frame_timer);
+#endif
+
+#define RGBA_PARAM(col)				the_palette_r[col],the_palette_g[col],the_palette_b[col],0xFF
+
+// sdl2_gfx substitutions of allegro functions
+
+#define rectfill(ren,tx,ty,bx,by,c)		boxRGBA(sdl_ren,tx,ty,bx,by,RGBA_PARAM(c))
+#define	line(ren,x1,y1,x2,y2,c)			lineRGBA(sdl_ren,x1,y1,x2,y2,RGBA_PARAM(c))
+#define hline(ren,x1,y,x2,c)			hlineRGBA(sdl_ren,x1,x2,y,RGBA_PARAM(c))
+#define vline(ren,x1,y1,y2,c)			vlineRGBA(sdl_ren,x1,y1,y2,RGBA_PARAM(c))
+#define circle(ren,x,y,r,c)			circleRGBA(sdl_ren,x,y,r,RGBA_PARAM(c))
+#define circlefill(ren,x,y,r,c)			filledCircleRGBA(sdl_ren,x,y,r,RGBA_PARAM(c))
+#define putpixel(ren,x,y,c)			pixelRGBA(sdl_ren,x,y,RGBA_PARAM(c))
+#define triangle(ren,x1,y1,x2,y2,x3,y3,c)	filledTrigonRGBA(sdl_ren,x1,y1,x2,y2,x3,y3,RGBA_PARAM(c))
+
+#define textout(g,font,str,x,y,c)		fprintf(stderr,"FIXME: no string function (textout) for displaying string \"%s\"\n",str)
+#define textout_centre(g,font,str,x,y,c)	fprintf(stderr,"FIXME: no string function (textout_centre) for displaying string \"%s\"\n",str)
+
+
+Uint8 the_palette_r[0x100];
+Uint8 the_palette_g[0x100];
+Uint8 the_palette_b[0x100];
+Uint32 the_palette32[0x100];
+
+#ifdef RES_512_512
+#	define	SCREEN_W	512
+#	define	SCREEN_H	512
+#else
+#	define	SCREEN_W	800
+#	define	SCREEN_H	600
+#endif
+
+
+// Allegro itofix
+static ETNK_INLINE fixed itofix ( int x ) {
+	return x << 16;
+}
+static ETNK_INLINE fixed ftofix ( double x ) {
+	if (x > 32767.0) {
+		//*allegro_errno = ERANGE;
+		return 0x7FFFFFFF;
+	}
+	if (x < -32767.0) {
+		//*allegro_errno = ERANGE;
+		return -0x7FFFFFFF;
+	}
+	return (fixed)(x * 65536.0 + (x < 0 ? -0.5 : 0.5));
+}
+static ETNK_INLINE double fixtof ( fixed x ) {
+	return (double)x / 65536.0;
+}
+static ETNK_INLINE fixed fixmul ( fixed x, fixed y ) {
+	return ftofix(fixtof(x) * fixtof(y));
+#if 0
+	LONG_LONG lx = x;
+	LONG_LONG ly = y;
+	LONG_LONG lres = (lx*ly);
+	if (lres > 0x7FFFFFFF0000LL) {
+		*allegro_errno = ERANGE;
+		return 0x7FFFFFFF;
+	} else if (lres < -0x7FFFFFFF0000LL) {
+		*allegro_errno = ERANGE;
+		return 0x80000000;
+	} else {
+		int res = lres >> 16;
+		return res;
+	}
+#endif
+}
+static ETNK_INLINE fixed fixdiv ( fixed x, fixed y ) {
+	if (y == 0) {
+		//*allegro_errno = ERANGE;
+		return (x < 0) ? -0x7FFFFFFF : 0x7FFFFFFF;
+	} else
+		return ftofix(fixtof(x) / fixtof(y));
+}
+#define fmul(x,y)	fixmul(x,y)
+#define fdiv(x,y)	fixdiv(x,y)
 
 
 
 int gfx_graphics_startup (void)
 {
-	PALETTE the_palette;
-	int rv;
+	//PALETTE the_palette;
+	//int rv;
+
+	sdl_win = SDL_CreateWindow(
+		OUR_WINDOW_TITLE,
+		SDL_WINDOWPOS_UNDEFINED,
+		SDL_WINDOWPOS_UNDEFINED,
+		SCREEN_W, SCREEN_H,
+		SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_INPUT_FOCUS
+	);
+#if 0
 
 #ifdef ALLEGRO_WINDOWS	
-
 #ifdef RES_512_512
 	rv = set_gfx_mode(GFX_DIRECTX_OVL, 512, 512, 0, 0);
-	
 	if (rv != 0)
 		rv = set_gfx_mode(GFX_DIRECTX_WIN, 512, 512, 0, 0);
 
@@ -87,59 +182,90 @@ int gfx_graphics_startup (void)
 			    GFX_AUTODETECT_WINDOWED : GFX_AUTODETECT,
 			  800, 600, 0, 0);
 #endif
+#endif
 
-	if (rv != 0)
-	{
-		set_gfx_mode(GFX_TEXT, 0, 0, 0, 0);
-      	allegro_message("Unable to set graphics mode.");
-      	return 1;
-	}
-	
-	datafile = load_datafile("elite.dat");
-	if (!datafile)
-	{
-		set_gfx_mode(GFX_TEXT, 0, 0, 0, 0);
-      	allegro_message("Error loading %s!\n", "elite.dat");
-      	return 1;
-	}
-
-	scanner_image = load_bitmap(scanner_filename, the_palette);
-	if (!scanner_image)
-	{
-		set_gfx_mode(GFX_TEXT, 0, 0, 0, 0);
-		allegro_message("Error reading scanner bitmap file.\n");
+//	if (rv != 0) {
+	if (!sdl_win) {
+		//set_gfx_mode(GFX_TEXT, 0, 0, 0, 0);
+		ERROR_WINDOW("Unable to open window: %s", SDL_GetError());
 		return 1;
 	}
 
+	sdl_ren = SDL_CreateRenderer(sdl_win, -1, SDL_RENDERER_ACCELERATED);
+	if (!sdl_ren) {
+		ERROR_WINDOW("Cannot create renderer: %s", SDL_GetError());
+		return 1;
+	}
+	SDL_PixelFormat *pixfmt = SDL_AllocFormat(PIXEL_FORMAT);
+	if (!pixfmt) {
+		ERROR_WINDOW("Cannot allocate pixel format: %s", SDL_GetError());
+		return 1;
+	}
+
+#if 0
+	datafile = load_datafile("elite.dat");
+	if (!datafile) {
+		set_gfx_mode(GFX_TEXT, 0, 0, 0, 0);
+		ERROR_WINDOW("Error loading %s!\n", "elite.dat");
+		return 1;
+	}
+#endif
+
+#if 0
+	scanner_image = load_bitmap(scanner_filename, the_palette);
+	if (!scanner_image) {
+		set_gfx_mode(GFX_TEXT, 0, 0, 0, 0);
+		ERROR_WINDOW("Error reading scanner bitmap file.\n");
+		return 1;
+	}
+#endif
+	scanner_surface = SDL_LoadBMP(scanner_filename);
+	if (!scanner_surface) {
+		ERROR_WINDOW("Cannot load scanner: %s", SDL_GetError());
+		return 1;
+	}
+	for (int a = 0; a < 255; a++) {
+		the_palette_r[a] = scanner_surface->format->palette->colors[a].r;
+		the_palette_g[a] = scanner_surface->format->palette->colors[a].g;
+		the_palette_b[a] = scanner_surface->format->palette->colors[a].b;
+		the_palette32[a] = SDL_MapRGBA(pixfmt, the_palette_r[a], the_palette_g[a], the_palette_b[a], 0xFF);
+	}
+	SDL_Texture *scanner_texture = SDL_CreateTextureFromSurface(sdl_ren, scanner_surface);
+
 	/* select the scanner palette */
-	set_palette(the_palette);
+	//set_palette(the_palette);
 
 	/* Create the screen buffer bitmap */
-	gfx_screen = create_bitmap (SCREEN_W, SCREEN_H);
+	//gfx_screen = create_bitmap (SCREEN_W, SCREEN_H);
+	
 
-	clear (gfx_screen);
+	//clear (gfx_screen);
 
-	blit (scanner_image, gfx_screen, 0, 0, GFX_X_OFFSET, 385+GFX_Y_OFFSET, scanner_image->w, scanner_image->h);
+	//blit (scanner_image, gfx_screen, 0, 0, GFX_X_OFFSET, 385+GFX_Y_OFFSET, scanner_image->w, scanner_image->h);
 	gfx_draw_line (0, 0, 0, 384);
 	gfx_draw_line (0, 0, 511, 0);
 	gfx_draw_line (511, 0, 511, 384);
 
+#if 0
 	/* Install a timer to regulate the speed of the game... */
 
 	LOCK_VARIABLE(frame_count);
 	LOCK_FUNCTION(frame_timer);
 	frame_count = 0;
 	install_int (frame_timer, speed_cap);
-	
+#endif	
 	return 0;
 }
 
 
 void gfx_graphics_shutdown (void)
 {
+	puts("ETNK: graphics shutdown");
+#if 0
 	destroy_bitmap(scanner_image);
 	destroy_bitmap(gfx_screen);
 	unload_datafile(datafile);
+#endif
 }
 
 
@@ -149,6 +275,7 @@ void gfx_graphics_shutdown (void)
 
 void gfx_update_screen (void)
 {
+#if 0
 	while (frame_count < 1)
 		rest (10);
 	frame_count = 0;
@@ -156,24 +283,32 @@ void gfx_update_screen (void)
 	acquire_screen();
  	blit (gfx_screen, screen, GFX_X_OFFSET, GFX_Y_OFFSET, GFX_X_OFFSET, GFX_Y_OFFSET, 512, 512);
 	release_screen();
+#endif
+	// TODO FIXME: add frame rate controll here?
+	SDL_RenderPresent(sdl_ren);
 }
 
 
 void gfx_acquire_screen (void)
 {
-	acquire_bitmap (gfx_screen);
+	// acquire_bitmap (gfx_screen);
+	puts("FIXME: gfx_acquire_screen() is not implemented");
 }
 
 
 void gfx_release_screen (void)
 {
-	release_bitmap(gfx_screen);
+	// release_bitmap(gfx_screen);
+	puts("FIXME: gfx_release_screen() is not implemented");
 }
+
 
 void gfx_fast_plot_pixel (int x, int y, int col)
 {
 	/* _putpixel(gfx_screen, x, y, col); */
-	gfx_screen->line[y][x] = col;
+	//gfx_screen->line[y][x] = col;
+	// FIXME really, it should be "FAST"?
+	putpixel(whatever, x, y, col);
 }
 
 
@@ -486,14 +621,14 @@ void gfx_draw_triangle (int x1, int y1, int x2, int y2, int x3, int y3, int col)
 
 void gfx_display_text (int x, int y, char *txt)
 {
-	text_mode (-1);
+	//text_mode (-1);
 	textout (gfx_screen, datafile[ELITE_1].dat, txt, (x / (2 / GFX_SCALE)) + GFX_X_OFFSET, (y / (2 / GFX_SCALE)) + GFX_Y_OFFSET, GFX_COL_WHITE);
 }
 
 
 void gfx_display_colour_text (int x, int y, char *txt, int col)
 {
-	text_mode (-1);
+	//text_mode (-1);
 	textout (gfx_screen, datafile[ELITE_1].dat, txt, (x / (2 / GFX_SCALE)) + GFX_X_OFFSET, (y / (2 / GFX_SCALE)) + GFX_Y_OFFSET, col);
 }
 
@@ -515,7 +650,7 @@ void gfx_display_centre_text (int y, char *str, int psize, int col)
 		txt_colour = col;
 	}
 
-	text_mode (-1);
+	//text_mode (-1);
 	textout_centre (gfx_screen,  datafile[txt_size].dat, str, (128 * GFX_SCALE) + GFX_X_OFFSET, (y / (2 / GFX_SCALE)) + GFX_Y_OFFSET, txt_colour);
 }
 
@@ -536,6 +671,9 @@ void gfx_clear_area (int tx, int ty, int bx, int by)
 	rectfill (gfx_screen, tx + GFX_X_OFFSET, ty + GFX_Y_OFFSET,
 				   bx + GFX_X_OFFSET, by + GFX_Y_OFFSET, GFX_COL_BLACK);
 }
+
+
+
 
 void gfx_draw_rectangle (int tx, int ty, int bx, int by, int col)
 {
@@ -577,25 +715,44 @@ void gfx_display_pretty_text (int tx, int ty, int bx, int by, char *txt)
 
 		*bptr = '\0';
 
-		text_mode (-1);
+		//text_mode (-1);
 		textout (gfx_screen, datafile[ELITE_1].dat, strbuf, tx + GFX_X_OFFSET, ty + GFX_Y_OFFSET, GFX_COL_WHITE);
 		ty += (8 * GFX_SCALE);
 	}
 }
 
 
+static ETNK_INLINE void set_clip ( int x1, int y1, int x2, int y2 )
+{
+	SDL_Rect rect;
+	rect.x = x1;
+	rect.y = y1;
+	rect.w = x2 - x1;
+	rect.h = y2 - y1;
+	// FIXME: check?
+	if (rect.w <= 0 || rect.h <=0 || rect.x < 0 || rect.y < 0)
+		fprintf(stderr, "SUSPECT clipping: set_clip(%d,%d,%d,%d)\n", x1,y1,x2,y2);
+	SDL_RenderSetClipRect(sdl_ren, &rect);
+}
+
+
+
+
 void gfx_draw_scanner (void)
 {
-	set_clip(gfx_screen, GFX_X_OFFSET, 385 + GFX_Y_OFFSET,
+	fprintf(stderr, "FIXME: gfx_draw_scanner() is not implemented :(\n");
+#if 0
+	set_clip(/*gfx_screen,*/ GFX_X_OFFSET, 385 + GFX_Y_OFFSET,
 		 GFX_X_OFFSET + scanner_image->w,
 		 GFX_Y_OFFSET + scanner_image->h + 385);
 	blit (scanner_image, gfx_screen, 0, 0, GFX_X_OFFSET,
-	      385+GFX_Y_OFFSET, scanner_image->w, scanner_image->h);
+	     385+GFX_Y_OFFSET, scanner_image->w, scanner_image->h);
+#endif
 }
 
 void gfx_set_clip_region (int tx, int ty, int bx, int by)
 {
-	set_clip (gfx_screen, tx + GFX_X_OFFSET, ty + GFX_Y_OFFSET, bx + GFX_X_OFFSET, by + GFX_Y_OFFSET);
+	set_clip (/*gfx_screen,*/ tx + GFX_X_OFFSET, ty + GFX_Y_OFFSET, bx + GFX_X_OFFSET, by + GFX_Y_OFFSET);
 }
 
 
@@ -692,8 +849,10 @@ void gfx_finish_render (void)
 }
 
 
+
 void gfx_polygon (int num_points, int *poly_list, int face_colour)
 {
+#if 0
 	int i;
 	int x,y;
 	
@@ -708,11 +867,20 @@ void gfx_polygon (int num_points, int *poly_list, int face_colour)
 	}
 	
 	polygon (gfx_screen, num_points, poly_list, face_colour);
+#endif
+	Sint16 vx[MAX_POLYS], vy[MAX_POLYS];
+	for (int i = 0, j = 0; i < num_points; i++) {
+		vx[i] = poly_list[j++] + GFX_X_OFFSET;
+		vy[i] = poly_list[j++] + GFX_Y_OFFSET;
+	}
+	filledPolygonRGBA(sdl_ren, vx, vy, num_points, RGBA_PARAM(face_colour));
 }
 
 
 void gfx_draw_sprite (int sprite_no, int x, int y)
 {
+	fprintf(stderr, "FIXME: no gfx_draw_sprite(%d,%d,%d) is implemented :(\n", sprite_no,x,y);
+#if 0
 	BITMAP *sprite_bmp;
 	
 	switch (sprite_no)
@@ -761,11 +929,16 @@ void gfx_draw_sprite (int sprite_no, int x, int y)
 		x = ((256 * GFX_SCALE) - sprite_bmp->w) / 2;
 	
 	draw_sprite (gfx_screen, sprite_bmp, x + GFX_X_OFFSET, y + GFX_Y_OFFSET);
+#endif
 }
 
 
 int gfx_request_file (char *title, char *path, char *ext)
 {
+	// TODO / FIXME
+	fprintf(stderr, "FIXME: add file selector code! [title=\"%s\" path=\"%s\" ext=\"%s\"]\n", title, path, ext);
+	return 0;
+#if 0
 	int okay;
 
 	show_mouse (screen);
@@ -773,5 +946,81 @@ int gfx_request_file (char *title, char *path, char *ext)
 	show_mouse (NULL);
 
 	return okay;
+#endif
 }
 
+
+
+static void shutdown_sdl ( void )
+{
+	puts("SDL: shutting system down ...");
+	if (sdl_win)
+		SDL_DestroyWindow(sdl_win);
+	SDL_Quit();
+}
+
+
+int init_sdl ( void )
+{
+	if (SDL_Init(
+#ifdef __EMSCRIPTEN__
+		/* It seems there is an issue with emscripten SDL2: SDL_Init does not work if TIMER and/or HAPTIC is tried to be intialized or just "EVERYTHING" is used!! */
+		SDL_INIT_EVERYTHING & ~(SDL_INIT_TIMER | SDL_INIT_HAPTIC)
+#else
+		SDL_INIT_EVERYTHING
+#endif
+	)) {
+		ERROR_WINDOW("Cannot initialize SDL: %s", SDL_GetError());
+		return 1;
+	}
+	atexit(shutdown_sdl);
+	//SDL_StartTextInput();
+#if 0
+	allegro_init();
+	install_keyboard(); 
+	install_timer();
+	install_mouse();
+#endif
+	// FIXME: no joystick ...
+	have_joystick = 0;
+#if 0   
+	if (install_joystick(JOY_TYPE_AUTODETECT) == 0) {
+		have_joystick = (num_joysticks > 0);
+	}
+#endif
+	return 0;
+}
+
+int sdl_last_key_pressed;
+char key[KEY_MAX];
+
+
+void handle_sdl_events ( void )
+{
+	SDL_Event event;
+	while (SDL_PollEvent(&event)) {
+		switch (event.type) {
+			case SDL_QUIT:
+				exit(0);	// FIXME: do it nicer ....
+			case SDL_KEYUP:
+			case SDL_KEYDOWN:
+				printf("KEY: scan=%s[#%d] sym=%s[#%d] event=%s repeated=%d\n",
+					SDL_GetScancodeName(event.key.keysym.scancode),
+					event.key.keysym.scancode,
+					SDL_GetKeyName(event.key.keysym.sym),
+					event.key.keysym.sym,
+					event.key.state == SDL_PRESSED ? "DOWN": "UP",
+					event.key.repeat
+				);
+				if (event.key.keysym.sym > 0 && event.key.keysym.sym < KEY_MAX && !event.key.repeat) {
+					if (event.key.state == SDL_PRESSED) {
+						key[event.key.keysym.sym] = 1;
+						sdl_last_key_pressed = event.key.keysym.sym;
+					} else {
+						key[event.key.keysym.sym] = 0;
+					}
+				}
+				break;
+		}
+	}
+}

@@ -21,12 +21,12 @@
   *
   */
  
- 
+#include "etnk.h"
+
 #include <stdlib.h>
 
-#include "config.h"
 #include "elite.h"
-#include "gfx.h"
+#include "sdl.h"
 #include "keyboard.h"
 #include "vector.h"
 #include "shipdata.h"
@@ -148,4 +148,3 @@ void update_intro2 (void)
 	gfx_display_centre_text (360, "Press Fire or Space, Commander.", 140, GFX_COL_GOLD);
 	gfx_display_centre_text (330, ship_list[ship_no]->name, 120, GFX_COL_WHITE);
 }
-

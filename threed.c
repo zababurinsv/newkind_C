@@ -11,15 +11,16 @@
  *
  */
 
+#include "etnk.h"
+
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
 #include <ctype.h>
 
-#include "config.h"
 #include "elite.h"
-#include "gfx.h"
+#include "sdl.h"
 #include "planet.h"
 #include "vector.h"
 #include "shipdata.h"
@@ -1061,4 +1062,3 @@ void draw_ship (struct univ_object *ship)
 	else
 		draw_solid_ship (ship);
 }
-

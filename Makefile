@@ -1,25 +1,26 @@
 DEPFILE	= newkind.depend
 CC	= gcc
-SRCS	= alg_gfx.c alg_main.c docked.c elite.c intro.c planet.c shipdata.c shipface.c sound.c space.c swat.c threed.c vector.c random.c trade.c options.c stars.c missions.c pilot.c file.c keyboard.c
+SRCS	= SDL2_gfxPrimitives.c SDL2_rotozoom.c sdl.c main.c docked.c elite.c intro.c planet.c shipdata.c shipface.c sound.c space.c swat.c threed.c vector.c random.c trade.c options.c stars.c missions.c pilot.c file.c keyboard.c
 OBJS	= $(SRCS:.c=.o)
-CFLAGS	= -std=c90 -pipe -Ofast -ffast-math -fno-common -falign-functions=16 -falign-loops=16 -Wall -g -I. $(shell allegro-config --cflags) -DHACKING -DHACKING_SUN_IS_POSITIVE
-LIBS	= -g $(shell allegro-config --libs)
+CFLAGS	= -std=c99 -pipe -Ofast -ffast-math -fno-common -falign-functions=16 -falign-loops=16 -Wall -g -I. $(shell sdl2-config --cflags)
+LDFLAGS	= -g $(shell sdl2-config --libs) -lm
 EXE	= newkind
+ALLDEPS	= Makefile
 
 all:
 	$(MAKE) $(DEPFILE)
 	$(MAKE) $(EXE)
 
-.c.o:
+.c.o: $(ALLDEPS)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-$(EXE): $(OBJS) Makefile
-	$(CC) -o $(EXE) $(OBJS) $(LIBS)
+$(EXE): $(OBJS) $(ALLDEPS)
+	$(CC) -o $(EXE) $(OBJS) $(LDFLAGS)
 
 dep:
 	$(MAKE) $(DEPFILE)
 
-$(DEPFILE): Makefile *.c *.h
+$(DEPFILE): $(ALLDEPS) *.c *.h
 	$(CC) -MM $(CFLAGS) $(SRCS) > $(DEPFILE)
 
 clean:
@@ -27,7 +28,7 @@ clean:
 
 distclean:
 	$(MAKE) clean
-	rm -f $(DEPFILE) *~ *.swp a.out
+	rm -f *.depend *~ *.swp a.out
 
 .PHONY: dep all clean distclean
 

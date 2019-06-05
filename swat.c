@@ -18,13 +18,14 @@
  * Special Weapons And Tactics.
  */
 
+#include "etnk.h"
+
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "config.h"
-#include "gfx.h"
+#include "sdl.h"
 #include "elite.h"
 #include "vector.h"
 #include "swat.h"
@@ -1271,4 +1272,3 @@ void abandon_ship (void)
 	dock_player();
 	current_screen = SCR_BREAK_PATTERN;
 }
-
