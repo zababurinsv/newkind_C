@@ -285,7 +285,11 @@ void gfx_update_screen (void)
 	release_screen();
 #endif
 	// TODO FIXME: add frame rate controll here?
+	puts("gfx_update_screen() is called!");
 	SDL_RenderPresent(sdl_ren);
+	SDL_Delay(speed_cap);
+	SDL_SetRenderDrawColor(sdl_ren,0,0,0,0xFF);
+	SDL_RenderClear(sdl_ren);
 }
 
 
@@ -995,6 +999,70 @@ int sdl_last_key_pressed;
 char key[KEY_MAX];
 
 
+static const struct {
+	SDL_Keycode sdl;
+	int etnk;
+} keydefs[] = {
+	{ SDLK_0, KEY_0 },
+	{ SDLK_a, KEY_a },
+	{ SDLK_BACKSPACE, KEY_BACKSPACE },
+	{ SDLK_c, KEY_c },
+	{ SDLK_COMMA, KEY_COMMA },
+	{ SDLK_d, KEY_d },
+	{ SDLK_DOWN, KEY_DOWN },
+	{ SDLK_e, KEY_e },
+	{ SDLK_ESCAPE, KEY_ESCAPE },
+	{ SDLK_f, KEY_f },
+	{ SDLK_F1, KEY_F1 },
+	{ SDLK_F10, KEY_F10 },
+	{ SDLK_F11, KEY_F11 },
+	{ SDLK_F12, KEY_F12 },
+	{ SDLK_F2, KEY_F2 },
+	{ SDLK_F3, KEY_F3 },
+	{ SDLK_F4, KEY_F4 },
+	{ SDLK_F5, KEY_F5 },
+	{ SDLK_F6, KEY_F6 },
+	{ SDLK_F7, KEY_F7 },
+	{ SDLK_F8, KEY_F8 },
+	{ SDLK_F9, KEY_F9 },
+	{ SDLK_h, KEY_h },
+	{ SDLK_i, KEY_i },
+	{ SDLK_j, KEY_j },
+	{ SDLK_LCTRL, KEY_LCTRL },
+	{ SDLK_LEFT, KEY_LEFT },
+	{ SDLK_m, KEY_m },
+	{ SDLK_n, KEY_n },
+	{ SDLK_o, KEY_o },
+	{ SDLK_p, KEY_p },
+	{ SDLK_r, KEY_r },
+	{ SDLK_RCTRL, KEY_RCTRL },
+	{ SDLK_RETURN, KEY_RETURN },
+	{ SDLK_RIGHT, KEY_RIGHT },
+	{ SDLK_s, KEY_s },
+	{ SDLK_SLASH, KEY_SLASH },
+	{ SDLK_SPACE, KEY_SPACE },
+	{ SDLK_STOP, KEY_STOP },
+	{ SDLK_t, KEY_t },
+	{ SDLK_TAB, KEY_TAB },
+	{ SDLK_u, KEY_u },
+	{ SDLK_UP, KEY_UP },
+	{ SDLK_x, KEY_x },
+	{ SDLK_y, KEY_y },
+	{ SDLK_z, KEY_z },
+	{ 0, 0 }
+};
+
+
+static int decode_keysym ( SDL_Keycode sym )
+{
+	for (int i = 0; keydefs[i].sdl; i++) {
+		if (sym == keydefs[i].sdl)
+			return keydefs[i].etnk;
+	}
+	return -1;
+}
+
+
 void handle_sdl_events ( void )
 {
 	SDL_Event event;
@@ -1012,12 +1080,15 @@ void handle_sdl_events ( void )
 					event.key.state == SDL_PRESSED ? "DOWN": "UP",
 					event.key.repeat
 				);
-				if (event.key.keysym.sym > 0 && event.key.keysym.sym < KEY_MAX && !event.key.repeat) {
-					if (event.key.state == SDL_PRESSED) {
-						key[event.key.keysym.sym] = 1;
-						sdl_last_key_pressed = event.key.keysym.sym;
-					} else {
-						key[event.key.keysym.sym] = 0;
+				if (!event.key.repeat) {
+					int game_code = decode_keysym(event.key.keysym.sym);
+					if (game_code >= 0) {
+						if (event.key.state == SDL_PRESSED) {
+							key[game_code] = 1;
+							sdl_last_key_pressed = game_code;
+						} else {
+							key[game_code] = 0;
+						}
 					}
 				}
 				break;

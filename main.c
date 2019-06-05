@@ -749,19 +749,19 @@ static void check_cheat_keys(void)
     return;
 
   for (i = 0; i < 10; i++) {
-    if (old_key[SDLK_0 + i] == 1) {
+    if (old_key[KEY_0 + i] == 1) {
       cheat_arg = cheat_arg * 10 + i;
       goto ok;
     }
   }
 
-  if (old_key[SDLK_c] == 1)
+  if (old_key[KEY_c] == 1)
     goto done;
 
   if (docked)
     return;
 
-  if (old_key[SDLK_s] == 1) {
+  if (old_key[KEY_s] == 1) {
     if (cheat_arg < NO_OF_SHIPS) {
       int un = create_other_ship(cheat_arg);
       if (un != -1)
@@ -770,7 +770,7 @@ static void check_cheat_keys(void)
     }
   }
 
-  if (old_key[SDLK_d] == 1) {
+  if (old_key[KEY_d] == 1) {
     game_paused = 0;
     snd_play_sample (SND_DOCK);					
     dock_player();

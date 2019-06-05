@@ -97,6 +97,7 @@ static int keypressed ( void )
 static int poll_keyboard ( void )
 {
 	handle_sdl_events();
+	return 0;	// success
 }
 
 
@@ -125,56 +126,56 @@ void kbd_poll_keyboard (void)
 	}
 	memcpy(old_key, key, KEY_MAX);
 
-	kbd_F1_pressed = key[SDLK_F1];
-	kbd_F2_pressed = key[SDLK_F2];
-	kbd_F3_pressed = key[SDLK_F3];
-	kbd_F4_pressed = key[SDLK_F4];
-	kbd_F5_pressed = key[SDLK_F5];
-	kbd_F6_pressed = key[SDLK_F6];
-	kbd_F7_pressed = key[SDLK_F7];
-	kbd_F8_pressed = key[SDLK_F8];
-	kbd_F9_pressed = key[SDLK_F9];
-	kbd_F10_pressed = key[SDLK_F10];
-	kbd_F11_pressed = key[SDLK_F11];
-	kbd_F12_pressed = key[SDLK_F12];
+	kbd_F1_pressed = key[KEY_F1];
+	kbd_F2_pressed = key[KEY_F2];
+	kbd_F3_pressed = key[KEY_F3];
+	kbd_F4_pressed = key[KEY_F4];
+	kbd_F5_pressed = key[KEY_F5];
+	kbd_F6_pressed = key[KEY_F6];
+	kbd_F7_pressed = key[KEY_F7];
+	kbd_F8_pressed = key[KEY_F8];
+	kbd_F9_pressed = key[KEY_F9];
+	kbd_F10_pressed = key[KEY_F10];
+	kbd_F11_pressed = key[KEY_F11];
+	kbd_F12_pressed = key[KEY_F12];
 
-	kbd_y_pressed = key[SDLK_y];
-	kbd_n_pressed = key[SDLK_n];
-	kbd_zoom_pressed = key[SDLK_z];
+	kbd_y_pressed = key[KEY_y];
+	kbd_n_pressed = key[KEY_n];
+	kbd_zoom_pressed = key[KEY_z];
 
-	kbd_fire_pressed = key[SDLK_a];
-	kbd_ecm_pressed = key[SDLK_e];
-	kbd_energy_bomb_pressed = key[SDLK_TAB];
-	kbd_hyperspace_pressed = key[SDLK_h];
-	kbd_ctrl_pressed = (key[SDLK_LCTRL]) || (key[SDLK_RCTRL]);
-	kbd_jump_pressed = key[SDLK_j];
-	kbd_escape_pressed = key[SDLK_ESCAPE];
+	kbd_fire_pressed = key[KEY_a];
+	kbd_ecm_pressed = key[KEY_e];
+	kbd_energy_bomb_pressed = key[KEY_TAB];
+	kbd_hyperspace_pressed = key[KEY_h];
+	kbd_ctrl_pressed = (key[KEY_LCTRL]) || (key[KEY_RCTRL]);
+	kbd_jump_pressed = key[KEY_j];
+	kbd_escape_pressed = key[KEY_ESCAPE];
 
-	kbd_dock_pressed = key[SDLK_c];
-	kbd_d_pressed = key[SDLK_d];
-	kbd_origin_pressed = key[SDLK_o];
-	kbd_find_pressed = key[SDLK_f];
+	kbd_dock_pressed = key[KEY_c];
+	kbd_d_pressed = key[KEY_d];
+	kbd_origin_pressed = key[KEY_o];
+	kbd_find_pressed = key[KEY_f];
 
-	kbd_i_pressed = key[SDLK_i];
+	kbd_i_pressed = key[KEY_i];
 
-	kbd_fire_missile_pressed = key[SDLK_m];
-	kbd_target_missile_pressed = key[SDLK_t];
-	kbd_unarm_missile_pressed = key[SDLK_u];
+	kbd_fire_missile_pressed = key[KEY_m];
+	kbd_target_missile_pressed = key[KEY_t];
+	kbd_unarm_missile_pressed = key[KEY_u];
 	
-	kbd_pause_pressed = key[SDLK_p];
-	kbd_resume_pressed = key[SDLK_r];
+	kbd_pause_pressed = key[KEY_p];
+	kbd_resume_pressed = key[KEY_r];
 	
-	kbd_inc_speed_pressed = key[SDLK_SPACE];
-	kbd_dec_speed_pressed = key[SDLK_SLASH];
+	kbd_inc_speed_pressed = key[KEY_SPACE];
+	kbd_dec_speed_pressed = key[KEY_SLASH];
 	
-	kbd_up_pressed = key[SDLK_s] || key[SDLK_UP];
-	kbd_down_pressed = key[SDLK_x] || key[SDLK_DOWN];
-	kbd_left_pressed = key[SDLK_COMMA] || key[SDLK_LEFT];
-	kbd_right_pressed = key[SDLK_STOP] || key[SDLK_RIGHT];
+	kbd_up_pressed = key[KEY_s] || key[KEY_UP];
+	kbd_down_pressed = key[KEY_x] || key[KEY_DOWN];
+	kbd_left_pressed = key[KEY_COMMA] || key[KEY_LEFT];
+	kbd_right_pressed = key[KEY_STOP] || key[KEY_RIGHT];
 	
-	kbd_enter_pressed = key[SDLK_RETURN];
-	kbd_backspace_pressed = key[SDLK_BACKSPACE];
-	kbd_space_pressed = key[SDLK_SPACE];
+	kbd_enter_pressed = key[KEY_RETURN];
+	kbd_backspace_pressed = key[KEY_BACKSPACE];
+	kbd_space_pressed = key[KEY_SPACE];
 
 	while (keypressed())
 		readkey();
@@ -194,13 +195,13 @@ int kbd_read_key (void)
 	keycode = keynum >> 8;
 	keyasc = keynum & 255;
 
-	if (keycode == SDLK_RETURN)
+	if (keycode == KEY_RETURN)
 	{
 		kbd_enter_pressed = 1;
 		return 0;
 	} 
 
-	if (keycode == SDLK_BACKSPACE)
+	if (keycode == KEY_BACKSPACE)
 	{
 		kbd_backspace_pressed = 1;
 		return 0;
