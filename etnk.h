@@ -37,7 +37,8 @@ typedef int32_t fixed;
 /* --- my own hacks ~ LGB --- */
 
 /* try to work-around problem with crash after jumping the system, because of Sun having type ID of -2 */
-#define HACKING_SUN_IS_POSITIVE
+/* probably this is WRONG, TimSC suggested other more rational fix! So this is commented out for now, waiting for total removal. */
+// #define HACKING_SUN_IS_POSITIVE
 
 /* --- system stuffs --- */
 
