@@ -861,8 +861,8 @@ static ETNK_INLINE void set_clip ( int x1, int y1, int x2, int y2 )
 	SDL_Rect rect;
 	rect.x = x1;
 	rect.y = y1;
-	rect.w = x2 - x1;
-	rect.h = y2 - y1;
+	rect.w = x2 - x1 + 1;
+	rect.h = y2 - y1 + 1;
 	// FIXME: check?
 	if (rect.w <= 0 || rect.h <=0 || rect.x < 0 || rect.y < 0)
 		fprintf(stderr, "SUSPECT clipping: set_clip(%d,%d,%d,%d)\n", x1,y1,x2,y2);

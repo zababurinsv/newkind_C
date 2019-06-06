@@ -41,7 +41,6 @@ void snd_sound_startup (void);
 void snd_sound_shutdown (void);
 void snd_play_sample (int sample_no);
 void snd_play_midi (int midi_no, int repeat);
-void snd_update_sound (void);
 void snd_stop_midi (void);
 
 #endif

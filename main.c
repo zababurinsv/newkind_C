@@ -1413,7 +1413,7 @@ int main()
 		
 		while (!game_over)
 		{
-			snd_update_sound();
+			//snd_update_sound();
 			gfx_update_screen();
 			gfx_set_clip_region (1, 1, 510, 383);
 
