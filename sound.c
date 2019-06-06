@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include "sound.h"
 #include "alg_data.h" 
+#include "sdl.h"
 
 #define NUM_SAMPLES 14 
 
@@ -28,12 +29,13 @@
 
 static int sound_on;
 
+#if 0
 // FIXME
 #define SAMPLE void
 
 struct sound_sample
 {
- 	SAMPLE *sample;
+	Uint8 *sample;
 	char filename[256];
 	int runtime;
 	int timeleft;
@@ -56,10 +58,67 @@ struct sound_sample sample_list[NUM_SAMPLES] =
 	{NULL, "beep.wav",		 2, 0},
 	{NULL, "boop.wav",		 7, 0},
 };
- 
- 
+#endif
+
+static const char *sample_filenames[NUM_SAMPLES] = {
+	"launch.wav", "crash.wav", "dock.wav", "gameover.wav", "pulse.wav", "hitem.wav", "explode.wav", "ecm.wav", "missile.wav", "hyper.wav", "incom1.wav", "incom2.wav", "beep.wav", "boop.wav"
+};
+static const Uint8 *sample_p[NUM_SAMPLES];
+static int    sample_s[NUM_SAMPLES];
+
+
+static SDL_AudioDeviceID audio = 0;
+
+
+static const Uint8 *playing_pos = NULL;
+static const Uint8 *playing_end = NULL;
+
+
+static void audio_callback ( void *userdata, Uint16 *stream, int len )
+{
+	for (int i = 0; i < len/2; i++) {
+		if (playing_pos) {
+			stream[i] = *(Sint16*)playing_pos;
+			playing_pos+=2;
+			if (playing_pos >= playing_end) {
+				playing_pos = NULL;
+				puts("AUDIO: end of sample");
+			}
+		} else {
+			stream[i] = 0;
+		}
+	}
+}
+
+
+
 void snd_sound_startup (void)
 {
+	for (int i = 0; i < NUM_SAMPLES; i++)
+		datafile_select(sample_filenames[i], &sample_p[i], &sample_s[i]);
+	SDL_AudioSpec audio_want, audio_got;
+	SDL_memset(&audio_want, 0, sizeof(audio_want));
+	audio_want.freq = 44100;
+	audio_want.format = AUDIO_S16SYS;
+	audio_want.channels = 1;
+	audio_want.samples = 1024;
+	audio_want.callback = audio_callback;
+	audio_want.userdata = NULL;
+	audio = SDL_OpenAudioDevice(NULL, 0, &audio_want, &audio_got, 0);
+	if (audio) {
+		if (audio_want.freq != audio_got.freq || audio_want.format != audio_got.format || audio_want.channels != audio_got.channels) {
+			SDL_CloseAudioDevice(audio);    // forget audio, if it's not our expected format :(
+			audio = 0;
+			fprintf(stderr, "Audio parameter mismatches\n");
+		} else {
+			printf("AUDIO: initialized (#%d), %d Hz, %d channels, %d buffer sample size.\n", audio, audio_got.freq, audio_got.channels, audio_got.samples);
+			playing_pos = NULL;
+			SDL_PauseAudioDevice(audio, 0);
+		}
+	} else
+		fprintf(stderr, "Cannot open audio: %s\n", SDL_GetError());
+
+
 #if 0
 	int i;
 
@@ -84,6 +143,11 @@ void snd_sound_startup (void)
 
 void snd_sound_shutdown (void)
 {
+	if (audio) {
+		puts("AUDIO: closing");
+		SDL_PauseAudioDevice(audio, 1);
+		SDL_CloseAudioDevice(audio);
+	}
 #if 0
 	int i;
 
@@ -105,6 +169,13 @@ void snd_sound_shutdown (void)
 void snd_play_sample (int sample_no)
 {
 	puts("FIXME: snd_play_sample() not implemented");
+	if (audio == 0 || sample_no >= NUM_SAMPLES) {
+		return;
+	}
+	//playing_sample = sample_no;
+	playing_pos = sample_p[sample_no] + 44;	// really lame, we use WAVs as is, without even checking header or anything and assuming that it will work. wow. :-O
+	playing_end = sample_p[sample_no] + sample_s[sample_no] - 44;
+	//SDL_PauseAudioDevice(audio, 0);
 #if 0
 	if (!sound_on)
 		return;

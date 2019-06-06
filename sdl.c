@@ -30,6 +30,7 @@
 #include "elite.h"
 #include "keyboard.h"
 #include "datafile.h"
+#include "sound.h"
 
 static SDL_Texture	*sdl_tex = NULL;
 static SDL_Window	*sdl_win = NULL;
@@ -39,10 +40,6 @@ static SDL_Renderer	*sdl_ren = NULL;
 
 static int start_poly;
 static int total_polys;
-
-static const Uint8 *datafile_p;
-static int datafile_s;
-
 
 int have_joystick;
 
@@ -102,14 +99,14 @@ static struct {
 } sprites[IMG_NUM_OF];
 
 
-void datafile_select ( const char *fn )
+void datafile_select ( const char *fn, const Uint8 **data_p, int *data_size )
 {
 	int offset = 0;
 	for (int i = 0; datafile_filenames[i]; i++) {
 		if (!strcmp(fn, datafile_filenames[i])) {
-			datafile_p = datafile_storage + offset;
-			datafile_s = datafile_sizes[i];
-			printf("DATAFILE: selected=\"%s\", size=%d, offset=%d\n", fn, datafile_s, offset);
+			*data_p = datafile_storage + offset;
+			*data_size = datafile_sizes[i];
+			printf("DATAFILE: selected=\"%s\", size=%d, offset=%d\n", fn, datafile_sizes[i], offset);
 			return;
 		}
 		offset += datafile_sizes[i];
@@ -121,8 +118,10 @@ void datafile_select ( const char *fn )
 
 SDL_RWops *datafile_open ( const char *fn )
 {
-	datafile_select(fn);
-	SDL_RWops *v = SDL_RWFromConstMem(datafile_p, datafile_s);
+	const Uint8 *data_p;
+	int data_size;
+	datafile_select(fn, &data_p, &data_size);
+	SDL_RWops *v = SDL_RWFromConstMem(data_p, data_size);
 	if (!v) {
 		ERROR_WINDOW("DATAFILE: cannot create rwmem from databank for \"%s\": %s", fn, SDL_GetError());
 		exit(1);	// brutal ...
@@ -1052,6 +1051,7 @@ int gfx_request_file (char *title, char *path, char *ext)
 static void shutdown_sdl ( void )
 {
 	puts("SDL: shutting system down ...");
+	snd_sound_shutdown();
 	if (sdl_tex)
 		SDL_DestroyTexture(sdl_tex);
 	for (int i = 0; i < IMG_NUM_OF; i++)

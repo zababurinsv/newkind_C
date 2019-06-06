@@ -1561,9 +1561,5 @@ int main()
 			run_game_over_screen();
 	}
 
-	snd_sound_shutdown();
-	
-	//gfx_graphics_shutdown ();
-	
 	return 0;
 }
