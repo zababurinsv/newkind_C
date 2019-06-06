@@ -1563,7 +1563,7 @@ int main()
 
 	snd_sound_shutdown();
 	
-	gfx_graphics_shutdown ();
+	//gfx_graphics_shutdown ();
 	
 	return 0;
 }

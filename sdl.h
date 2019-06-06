@@ -131,7 +131,7 @@ extern int  init_sdl ( void );
 extern void handle_sdl_events ( void );
 
 extern int  gfx_graphics_startup (void);
-extern void gfx_graphics_shutdown (void);
+//extern void gfx_graphics_shutdown (void);
 extern void gfx_update_screen (void);
 extern void gfx_acquire_screen (void);
 extern void gfx_release_screen (void);

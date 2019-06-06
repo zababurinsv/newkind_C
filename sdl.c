@@ -2,11 +2,13 @@
  *
  * Elite - The New Kind.
  *
- * Allegro version of Graphics routines.
+ * SDL2 related routines, largely based on the original Allegro version of Graphics routines.
+ * In fact, kinda hacky, trying to emulate Allegro at some placed in odd ways ...
  *
  * The code in this file has not been derived from the original Elite code.
  * Written by C.J.Pinder 1999-2001.
  * email: <christian@newkind.co.uk>
+ * This code is re-worked/extened by G.Lenart (LGB) 2019, <lgblgblgb@gmail.com>
  *
  * Routines for drawing anti-aliased lines and circles by T.Harte.
  *
@@ -29,17 +31,9 @@
 #include "keyboard.h"
 #include "datafile.h"
 
-//BITMAP *gfx_screen;
-volatile int frame_count;
-//DATAFILE *datafile;
-//BITMAP *scanner_image;
-//SDL_Surface *scanner_surface;
-SDL_Texture *sdl_tex = NULL;
-SDL_Window *sdl_win = NULL;
-SDL_Renderer *sdl_ren = NULL;
-
-static SDL_Rect scanner_rect;
-//static SDL_Texture *scanner_texture;
+static SDL_Texture	*sdl_tex = NULL;
+static SDL_Window	*sdl_win = NULL;
+static SDL_Renderer	*sdl_ren = NULL;
 
 #define MAX_POLYS	100
 
@@ -67,14 +61,6 @@ static struct poly_data poly_chain[MAX_POLYS];
 #define PIXEL_FORMAT SDL_PIXELFORMAT_ARGB8888
 
 
-#if 0
-void frame_timer (void)
-{
-	frame_count++;
-}
-END_OF_FUNCTION(frame_timer);
-#endif
-
 #define RGBA_PARAM(col)				the_palette_r[col],the_palette_g[col],the_palette_b[col],0xFF
 
 // sdl2_gfx substitutions of allegro functions
@@ -98,7 +84,7 @@ END_OF_FUNCTION(frame_timer);
 Uint8 the_palette_r[0x100];
 Uint8 the_palette_g[0x100];
 Uint8 the_palette_b[0x100];
-Uint32 the_palette32[0x100];
+//Uint32 the_palette32[0x100];
 
 #ifdef RES_512_512
 #	define	SCREEN_W	512
@@ -110,8 +96,9 @@ Uint32 the_palette32[0x100];
 
 static struct {
 	SDL_Texture *tex;
-	int w;
-	int h;
+	SDL_Rect rect;
+//	int w;
+//	int h;
 } sprites[IMG_NUM_OF];
 
 
@@ -163,10 +150,13 @@ static void load_sprite ( int i, const char *fn, SDL_Surface **pass_surface_back
 		ERROR_WINDOW("Cannot create texture from \"%s\": %s", fn, SDL_GetError());
 		exit(1);
 	}
-	if (SDL_QueryTexture(sprites[i].tex, NULL, NULL, &sprites[i].w, &sprites[i].h)) {
+	if (SDL_QueryTexture(sprites[i].tex, NULL, NULL, &sprites[i].rect.w, &sprites[i].rect.h)) {
 		ERROR_WINDOW("Cannot query texture for \"%s\": %s", fn, SDL_GetError());
 		exit(1);
 	}
+	// these must be set by the drawer func ...
+	sprites[i].rect.x = 0;
+	sprites[i].rect.y = 0;
 }
 
 
@@ -306,9 +296,20 @@ int gfx_graphics_startup (void)
 	SDL_SetRenderDrawColor(sdl_ren, 0,0,0,0xFF);
 	SDL_RenderClear(sdl_ren);
 
+	for (int a = 0; a < IMG_NUM_OF; a++)
+		sprites[a].tex = NULL;
 
 	SDL_Surface *surface;
-	load_sprite(IMG_THE_SCANNER, "scanner.bmp", &surface);
+	load_sprite(IMG_THE_SCANNER,	"scanner.bmp",	&surface);
+	load_sprite(IMG_GREEN_DOT,	"greendot.bmp",	NULL);
+	load_sprite(IMG_RED_DOT,	"reddot.bmp",	NULL);
+	load_sprite(IMG_BIG_S,		"safe.bmp",	NULL);
+	load_sprite(IMG_ELITE_TXT,	"elitetx3.bmp",	NULL);
+	load_sprite(IMG_BIG_E,		"ecm.bmp",	NULL);
+	load_sprite(IMG_BLAKE,		"blake.bmp",	NULL);
+	load_sprite(IMG_MISSILE_GREEN,	"missgrn.bmp",	NULL);
+	load_sprite(IMG_MISSILE_YELLOW,	"missyell.bmp",	NULL);
+	load_sprite(IMG_MISSILE_RED,	"missred.bmp",	NULL);
 //	surface = SDL_LoadBMP(scanner_filename);
 //	if (!surface) {
 //		ERROR_WINDOW("Cannot load scanner: %s", SDL_GetError());
@@ -318,10 +319,10 @@ int gfx_graphics_startup (void)
 		the_palette_r[a] = surface->format->palette->colors[a].r;
 		the_palette_g[a] = surface->format->palette->colors[a].g;
 		the_palette_b[a] = surface->format->palette->colors[a].b;
-		the_palette32[a] = SDL_MapRGBA(pixfmt, the_palette_r[a], the_palette_g[a], the_palette_b[a], 0xFF);
+		//the_palette32[a] = SDL_MapRGBA(pixfmt, the_palette_r[a], the_palette_g[a], the_palette_b[a], 0xFF);
 	}
+	SDL_FreeSurface(surface);
 //	scanner_texture = SDL_CreateTextureFromSurface(sdl_ren, surface);
-//	SDL_FreeSurface(surface);
 //	scanner_texture = sprites[0].tex;
 
 	surface = SDL_LoadBMP_RW(datafile_open("icon.bmp"), 1);
@@ -340,10 +341,12 @@ int gfx_graphics_startup (void)
 	//clear (gfx_screen);
 
 	//blit (scanner_image, gfx_screen, 0, 0, GFX_X_OFFSET, 385+GFX_Y_OFFSET, scanner_image->w, scanner_image->h);
-	scanner_rect.x = GFX_X_OFFSET;
-	scanner_rect.y = 385+GFX_Y_OFFSET;
-	scanner_rect.w = sprites[IMG_THE_SCANNER].w;
-	scanner_rect.h = sprites[IMG_THE_SCANNER].h;
+	sprites[IMG_THE_SCANNER].rect.x = GFX_X_OFFSET;
+	sprites[IMG_THE_SCANNER].rect.y = 385 + GFX_Y_OFFSET;
+	//scanner_rect.x = GFX_X_OFFSET;
+	//scanner_rect.y = 385+GFX_Y_OFFSET;
+	//scanner_rect.w = sprites[IMG_THE_SCANNER].w;
+	//scanner_rect.h = sprites[IMG_THE_SCANNER].h;
 	//scanner_rect.w = scanner_texture->width;
 	//scanner_rect.h = scanner_texture->height;
 	//SDL_QueryTexture(scanner_texture,NULL,NULL,&scanner_rect.w,&scanner_rect.h);
@@ -353,15 +356,6 @@ int gfx_graphics_startup (void)
 	gfx_draw_line (0, 0, 511, 0);
 	gfx_draw_line (511, 0, 511, 384);
 
-	load_sprite(IMG_GREEN_DOT,	"greendot.bmp",	NULL);
-	load_sprite(IMG_RED_DOT,	"reddot.bmp",	NULL);
-	load_sprite(IMG_BIG_S,		"safe.bmp",	NULL);
-	load_sprite(IMG_ELITE_TXT,	"elitetx3.bmp",	NULL);
-	load_sprite(IMG_BIG_E,		"ecm.bmp",	NULL);
-	load_sprite(IMG_BLAKE,		"blake.bmp",	NULL);
-	load_sprite(IMG_MISSILE_GREEN,	"missgrn.bmp",	NULL);
-	load_sprite(IMG_MISSILE_YELLOW,	"missyell.bmp",	NULL);
-	load_sprite(IMG_MISSILE_RED,	"missred.bmp",	NULL);
 
 #if 0
 	/* Install a timer to regulate the speed of the game... */
@@ -691,10 +685,16 @@ void gfx_draw_aa_line (int x1, int y1, int x2, int y2)
 
 void gfx_draw_circle (int cx, int cy, int radius, int circle_colour)
 {
+	puts("gfx_draw_circle()");
+	//circle (gfx_screen, cx + GFX_X_OFFSET, cy + GFX_Y_OFFSET, radius, circle_colour);
+
+//#if 0
+
 	if (anti_alias_gfx && (circle_colour == GFX_COL_WHITE))
 		gfx_draw_aa_circle (cx, cy, itofix(radius));
 	else	
 		circle (gfx_screen, cx + GFX_X_OFFSET, cy + GFX_Y_OFFSET, radius, circle_colour);
+//#endif
 }
 
 
@@ -768,8 +768,10 @@ void gfx_display_colour_text (int x, int y, char *txt, int col)
 
 void gfx_display_centre_text (int y, char *str, int psize, int col)
 {
-	int txt_size;
 	int txt_colour;
+#if 0
+	// FIXME: add txt_size support!
+	int txt_size;
 	
 	if (psize == 140)
 	{
@@ -781,7 +783,8 @@ void gfx_display_centre_text (int y, char *str, int psize, int col)
 		txt_size = ELITE_1;
 		txt_colour = col;
 	}
-
+#endif
+	txt_colour = col;
 	//text_mode (-1);
 	textout_centre (gfx_screen,  datafile[txt_size].dat, str, (128 * GFX_SCALE) + GFX_X_OFFSET, (y / (2 / GFX_SCALE)) + GFX_Y_OFFSET, txt_colour);
 }
@@ -873,7 +876,7 @@ static ETNK_INLINE void set_clip ( int x1, int y1, int x2, int y2 )
 void gfx_draw_scanner (void)
 {
 	//fprintf(stderr, "FIXME: gfx_draw_scanner() is not implemented :(\n");
-	SDL_RenderCopy(sdl_ren, sprites[IMG_THE_SCANNER].tex, NULL, &scanner_rect);
+	SDL_RenderCopy(sdl_ren, sprites[IMG_THE_SCANNER].tex, NULL, &sprites[IMG_THE_SCANNER].rect);
 #if 0
 	set_clip(/*gfx_screen,*/ GFX_X_OFFSET, 385 + GFX_Y_OFFSET,
 		 GFX_X_OFFSET + scanner_image->w,
@@ -1010,65 +1013,21 @@ void gfx_polygon (int num_points, int *poly_list, int face_colour)
 }
 
 
-void gfx_draw_sprite (int sprite_no, int x, int y)
+void gfx_draw_sprite ( int sprite_no, int x, int y )
 {
-	//fprintf(stderr, "FIXME: no gfx_draw_sprite(%d,%d,%d) is implemented :(\n", sprite_no,x,y);
-	//BITMAP *sprite_bmp;
-
-	switch (sprite_no)
-	{
-		case IMG_GREEN_DOT:
-			//;sprite_bmp = [GRNDOT].dat;
-			break;
-		
-		case IMG_RED_DOT:
-			//sprite_bmp = datafile[REDDOT].dat;
-			break;
-			
-		case IMG_BIG_S:
-			//sprite_bmp = datafile[SAFE].dat;
-			break;
-		
-		case IMG_ELITE_TXT:
-			//sprite_bmp = datafile[ELITETXT].dat;
-			break;
-			
-		case IMG_BIG_E:
-			//sprite_bmp = datafile[ECM].dat;
-			break;
-			
-		case IMG_BLAKE:
-			//sprite_bmp = datafile[BLAKE].dat;
-			break;
-		
-		case IMG_MISSILE_GREEN:
-			//sprite_bmp = datafile[MISSILE_G].dat;
-			break;
-
-		case IMG_MISSILE_YELLOW:
-			//sprite_bmp = datafile[MISSILE_Y].dat;
-			break;
-
-		case IMG_MISSILE_RED:
-			//sprite_bmp = datafile[MISSILE_R].dat;
-			//tex = sprites[i].tex;
-			break;
-
-		default:
-			return;
+	if (sprite_no >= IMG_NUM_OF || !sprites[sprite_no].tex) {
+		ERROR_WINDOW("gfx_draw_sprite(): trying to render non-existing sprite number #%d", sprite_no);
+		exit(1);
 	}
-
 	if (x == -1)
-		x = ((256 * GFX_SCALE) - sprites[sprite_no].w) / 2;
-	
+		x = ((256 * GFX_SCALE) - sprites[sprite_no].rect.w) / 2;
 	//draw_sprite (gfx_screen, sprite_bmp, x + GFX_X_OFFSET, y + GFX_Y_OFFSET);
-	SDL_Rect rect;
-	rect.x = x + GFX_X_OFFSET;
-	rect.y = y + GFX_Y_OFFSET;
-	rect.w = sprites[sprite_no].w;
-	rect.h = sprites[sprite_no].h;
-
-	SDL_RenderCopy(sdl_ren, sprites[sprite_no].tex, NULL, &rect);
+	//SDL_Rect rect;
+	sprites[sprite_no].rect.x = x + GFX_X_OFFSET;
+	sprites[sprite_no].rect.y = y + GFX_Y_OFFSET;
+	//rect.w = sprites[sprite_no].w;
+	//rect.h = sprites[sprite_no].h;
+	SDL_RenderCopy(sdl_ren, sprites[sprite_no].tex, NULL, &sprites[sprite_no].rect);
 }
 
 
@@ -1093,6 +1052,13 @@ int gfx_request_file (char *title, char *path, char *ext)
 static void shutdown_sdl ( void )
 {
 	puts("SDL: shutting system down ...");
+	if (sdl_tex)
+		SDL_DestroyTexture(sdl_tex);
+	for (int i = 0; i < IMG_NUM_OF; i++)
+		if (sprites[i].tex)
+			SDL_DestroyTexture(sprites[i].tex);
+	if (sdl_ren)
+		SDL_DestroyRenderer(sdl_ren);
 	if (sdl_win)
 		SDL_DestroyWindow(sdl_win);
 	SDL_Quit();
