@@ -27,12 +27,13 @@
 #include "alg_data.h"
 #include "elite.h"
 #include "keyboard.h"
+#include "datafile.h"
 
 //BITMAP *gfx_screen;
 volatile int frame_count;
 //DATAFILE *datafile;
 //BITMAP *scanner_image;
-SDL_Surface *scanner_surface;
+//SDL_Surface *scanner_surface;
 SDL_Texture *sdl_tex = NULL;
 SDL_Window *sdl_win = NULL;
 SDL_Renderer *sdl_ren = NULL;
@@ -44,6 +45,10 @@ static SDL_Texture *scanner_texture;
 
 static int start_poly;
 static int total_polys;
+
+static const Uint8 *datafile_p;
+static int datafile_s;
+
 
 int have_joystick;
 
@@ -102,6 +107,66 @@ Uint32 the_palette32[0x100];
 #	define	SCREEN_W	800
 #	define	SCREEN_H	600
 #endif
+
+static struct {
+	SDL_Texture *tex;
+	int w;
+	int h;
+} sprites[1];
+
+
+void datafile_select ( const char *fn )
+{
+	int offset = 0;
+	for (int i = 0; datafile_filenames[i]; i++) {
+		if (!strcmp(fn, datafile_filenames[i])) {
+			datafile_p = datafile_storage + offset;
+			datafile_s = datafile_sizes[i];
+			printf("DATAFILE: selected=\"%s\", size=%d, offset=%d\n", fn, datafile_s, offset);
+			return;
+		}
+		offset += datafile_sizes[i];
+	}
+	ERROR_WINDOW("DATAFILE: cannot find \"%s\" in the databank!", fn);
+	exit(1);	// brutal ...
+}
+
+
+SDL_RWops *datafile_open ( const char *fn )
+{
+	datafile_select(fn);
+	SDL_RWops *v = SDL_RWFromConstMem(datafile_p, datafile_s);
+	if (!v) {
+		ERROR_WINDOW("DATAFILE: cannot create rwmem from databank for \"%s\": %s", fn, SDL_GetError());
+		exit(1);	// brutal ...
+	}
+	return v;
+}
+
+
+
+
+
+static int load_sprite ( int i, const char *fn, SDL_Surface **pass_surface_back )
+{
+	SDL_Surface *surface = SDL_LoadBMP_RW(datafile_open(fn), 1);
+	if (!surface) {
+		ERROR_WINDOW("Cannot load \"%s\": %s", fn, SDL_GetError());
+		return 1;
+	}
+	sprites[i].tex = SDL_CreateTextureFromSurface(sdl_ren, surface);
+	if (!pass_surface_back)
+		SDL_FreeSurface(surface);
+	else
+		*pass_surface_back = surface;
+	if (!sprites[i].tex) {
+		ERROR_WINDOW("Cannot create texture from \"%s\": %s", fn, SDL_GetError());
+		return 1;
+	}
+	SDL_QueryTexture(sprites[i].tex, NULL, NULL, &sprites[i].w, &sprites[i].h);
+	return 0;
+}
+
 
 
 // Allegro itofix
@@ -238,18 +303,31 @@ int gfx_graphics_startup (void)
 	}
 	SDL_SetRenderDrawColor(sdl_ren, 0,0,0,0xFF);
 	SDL_RenderClear(sdl_ren);
-	scanner_surface = SDL_LoadBMP(scanner_filename);
-	if (!scanner_surface) {
-		ERROR_WINDOW("Cannot load scanner: %s", SDL_GetError());
+
+
+	SDL_Surface *surface;
+	if (load_sprite(0, "scanner.bmp", &surface))
 		return 1;
-	}
+//	surface = SDL_LoadBMP(scanner_filename);
+//	if (!surface) {
+//		ERROR_WINDOW("Cannot load scanner: %s", SDL_GetError());
+//		return 1;
+//	}
 	for (int a = 0; a < 0x100; a++) {
-		the_palette_r[a] = scanner_surface->format->palette->colors[a].r;
-		the_palette_g[a] = scanner_surface->format->palette->colors[a].g;
-		the_palette_b[a] = scanner_surface->format->palette->colors[a].b;
+		the_palette_r[a] = surface->format->palette->colors[a].r;
+		the_palette_g[a] = surface->format->palette->colors[a].g;
+		the_palette_b[a] = surface->format->palette->colors[a].b;
 		the_palette32[a] = SDL_MapRGBA(pixfmt, the_palette_r[a], the_palette_g[a], the_palette_b[a], 0xFF);
 	}
-	scanner_texture = SDL_CreateTextureFromSurface(sdl_ren, scanner_surface);
+//	scanner_texture = SDL_CreateTextureFromSurface(sdl_ren, surface);
+//	SDL_FreeSurface(surface);
+	scanner_texture = sprites[0].tex;
+
+	surface = SDL_LoadBMP_RW(datafile_open("icon.bmp"), 1);
+	if (surface) {
+		SDL_SetWindowIcon(sdl_win, surface);
+		SDL_FreeSurface(surface);
+	}
 
 	/* select the scanner palette */
 	//set_palette(the_palette);
@@ -1133,3 +1211,6 @@ void handle_sdl_events ( void )
 		}
 	}
 }
+
+
+
