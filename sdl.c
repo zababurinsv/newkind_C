@@ -39,7 +39,7 @@ SDL_Window *sdl_win = NULL;
 SDL_Renderer *sdl_ren = NULL;
 
 static SDL_Rect scanner_rect;
-static SDL_Texture *scanner_texture;
+//static SDL_Texture *scanner_texture;
 
 #define MAX_POLYS	100
 
@@ -112,7 +112,7 @@ static struct {
 	SDL_Texture *tex;
 	int w;
 	int h;
-} sprites[1];
+} sprites[IMG_NUM_OF];
 
 
 void datafile_select ( const char *fn )
@@ -147,12 +147,12 @@ SDL_RWops *datafile_open ( const char *fn )
 
 
 
-static int load_sprite ( int i, const char *fn, SDL_Surface **pass_surface_back )
+static void load_sprite ( int i, const char *fn, SDL_Surface **pass_surface_back )
 {
 	SDL_Surface *surface = SDL_LoadBMP_RW(datafile_open(fn), 1);
 	if (!surface) {
 		ERROR_WINDOW("Cannot load \"%s\": %s", fn, SDL_GetError());
-		return 1;
+		exit(1);
 	}
 	sprites[i].tex = SDL_CreateTextureFromSurface(sdl_ren, surface);
 	if (!pass_surface_back)
@@ -161,15 +161,17 @@ static int load_sprite ( int i, const char *fn, SDL_Surface **pass_surface_back 
 		*pass_surface_back = surface;
 	if (!sprites[i].tex) {
 		ERROR_WINDOW("Cannot create texture from \"%s\": %s", fn, SDL_GetError());
-		return 1;
+		exit(1);
 	}
-	SDL_QueryTexture(sprites[i].tex, NULL, NULL, &sprites[i].w, &sprites[i].h);
-	return 0;
+	if (SDL_QueryTexture(sprites[i].tex, NULL, NULL, &sprites[i].w, &sprites[i].h)) {
+		ERROR_WINDOW("Cannot query texture for \"%s\": %s", fn, SDL_GetError());
+		exit(1);
+	}
 }
 
 
 
-// Allegro itofix
+// Allegro fixed math stuffs to "emulate" ...
 static ETNK_INLINE fixed itofix ( int x ) {
 	return x << 16;
 }
@@ -306,8 +308,7 @@ int gfx_graphics_startup (void)
 
 
 	SDL_Surface *surface;
-	if (load_sprite(0, "scanner.bmp", &surface))
-		return 1;
+	load_sprite(IMG_THE_SCANNER, "scanner.bmp", &surface);
 //	surface = SDL_LoadBMP(scanner_filename);
 //	if (!surface) {
 //		ERROR_WINDOW("Cannot load scanner: %s", SDL_GetError());
@@ -321,7 +322,7 @@ int gfx_graphics_startup (void)
 	}
 //	scanner_texture = SDL_CreateTextureFromSurface(sdl_ren, surface);
 //	SDL_FreeSurface(surface);
-	scanner_texture = sprites[0].tex;
+//	scanner_texture = sprites[0].tex;
 
 	surface = SDL_LoadBMP_RW(datafile_open("icon.bmp"), 1);
 	if (surface) {
@@ -341,13 +342,26 @@ int gfx_graphics_startup (void)
 	//blit (scanner_image, gfx_screen, 0, 0, GFX_X_OFFSET, 385+GFX_Y_OFFSET, scanner_image->w, scanner_image->h);
 	scanner_rect.x = GFX_X_OFFSET;
 	scanner_rect.y = 385+GFX_Y_OFFSET;
+	scanner_rect.w = sprites[IMG_THE_SCANNER].w;
+	scanner_rect.h = sprites[IMG_THE_SCANNER].h;
 	//scanner_rect.w = scanner_texture->width;
 	//scanner_rect.h = scanner_texture->height;
-	SDL_QueryTexture(scanner_texture,NULL,NULL,&scanner_rect.w,&scanner_rect.h);
-	SDL_RenderCopy(sdl_ren, scanner_texture, NULL, &scanner_rect);
+	//SDL_QueryTexture(scanner_texture,NULL,NULL,&scanner_rect.w,&scanner_rect.h);
+	//SDL_RenderCopy(sdl_ren, sprites[IMG_THE_SCANNER].tex, NULL, &scanner_rect);
+	gfx_draw_scanner();
 	gfx_draw_line (0, 0, 0, 384);
 	gfx_draw_line (0, 0, 511, 0);
 	gfx_draw_line (511, 0, 511, 384);
+
+	load_sprite(IMG_GREEN_DOT,	"greendot.bmp",	NULL);
+	load_sprite(IMG_RED_DOT,	"reddot.bmp",	NULL);
+	load_sprite(IMG_BIG_S,		"safe.bmp",	NULL);
+	load_sprite(IMG_ELITE_TXT,	"elitetx3.bmp",	NULL);
+	load_sprite(IMG_BIG_E,		"ecm.bmp",	NULL);
+	load_sprite(IMG_BLAKE,		"blake.bmp",	NULL);
+	load_sprite(IMG_MISSILE_GREEN,	"missgrn.bmp",	NULL);
+	load_sprite(IMG_MISSILE_YELLOW,	"missyell.bmp",	NULL);
+	load_sprite(IMG_MISSILE_RED,	"missred.bmp",	NULL);
 
 #if 0
 	/* Install a timer to regulate the speed of the game... */
@@ -390,12 +404,14 @@ void gfx_update_screen (void)
 	// TODO FIXME: add frame rate controll here?
 	puts("gfx_update_screen() is called!");
 	//SDL_RenderSetLogicalSize(sdl_ren, SCREEN_W, SCREEN_H);
+	/* switch renderer to the actual target (window) and render output */
 	SDL_SetRenderTarget(sdl_ren, NULL);
 	SDL_SetRenderDrawColor(sdl_ren,0,0,0,0xFF);
 	SDL_RenderClear(sdl_ren);
 	SDL_RenderCopy(sdl_ren, sdl_tex, NULL, NULL);
 	SDL_RenderPresent(sdl_ren);
 	//handle_sdl_events();
+	/* switch renderer target back to the texture then */
 	SDL_SetRenderTarget(sdl_ren, sdl_tex);
 	//SDL_SetRenderDrawColor(sdl_ren,0,0,0,0xFF);
 	//SDL_RenderClear(sdl_ren);
@@ -857,7 +873,7 @@ static ETNK_INLINE void set_clip ( int x1, int y1, int x2, int y2 )
 void gfx_draw_scanner (void)
 {
 	//fprintf(stderr, "FIXME: gfx_draw_scanner() is not implemented :(\n");
-	SDL_RenderCopy(sdl_ren, scanner_texture, NULL, &scanner_rect);
+	SDL_RenderCopy(sdl_ren, sprites[IMG_THE_SCANNER].tex, NULL, &scanner_rect);
 #if 0
 	set_clip(/*gfx_screen,*/ GFX_X_OFFSET, 385 + GFX_Y_OFFSET,
 		 GFX_X_OFFSET + scanner_image->w,
@@ -996,46 +1012,46 @@ void gfx_polygon (int num_points, int *poly_list, int face_colour)
 
 void gfx_draw_sprite (int sprite_no, int x, int y)
 {
-	fprintf(stderr, "FIXME: no gfx_draw_sprite(%d,%d,%d) is implemented :(\n", sprite_no,x,y);
-#if 0
-	BITMAP *sprite_bmp;
-	
+	//fprintf(stderr, "FIXME: no gfx_draw_sprite(%d,%d,%d) is implemented :(\n", sprite_no,x,y);
+	//BITMAP *sprite_bmp;
+
 	switch (sprite_no)
 	{
 		case IMG_GREEN_DOT:
-			sprite_bmp = datafile[GRNDOT].dat;
+			//;sprite_bmp = [GRNDOT].dat;
 			break;
 		
 		case IMG_RED_DOT:
-			sprite_bmp = datafile[REDDOT].dat;
+			//sprite_bmp = datafile[REDDOT].dat;
 			break;
 			
 		case IMG_BIG_S:
-			sprite_bmp = datafile[SAFE].dat;
+			//sprite_bmp = datafile[SAFE].dat;
 			break;
 		
 		case IMG_ELITE_TXT:
-			sprite_bmp = datafile[ELITETXT].dat;
+			//sprite_bmp = datafile[ELITETXT].dat;
 			break;
 			
 		case IMG_BIG_E:
-			sprite_bmp = datafile[ECM].dat;
+			//sprite_bmp = datafile[ECM].dat;
 			break;
 			
 		case IMG_BLAKE:
-			sprite_bmp = datafile[BLAKE].dat;
+			//sprite_bmp = datafile[BLAKE].dat;
 			break;
 		
 		case IMG_MISSILE_GREEN:
-			sprite_bmp = datafile[MISSILE_G].dat;
+			//sprite_bmp = datafile[MISSILE_G].dat;
 			break;
 
 		case IMG_MISSILE_YELLOW:
-			sprite_bmp = datafile[MISSILE_Y].dat;
+			//sprite_bmp = datafile[MISSILE_Y].dat;
 			break;
 
 		case IMG_MISSILE_RED:
-			sprite_bmp = datafile[MISSILE_R].dat;
+			//sprite_bmp = datafile[MISSILE_R].dat;
+			//tex = sprites[i].tex;
 			break;
 
 		default:
@@ -1043,10 +1059,16 @@ void gfx_draw_sprite (int sprite_no, int x, int y)
 	}
 
 	if (x == -1)
-		x = ((256 * GFX_SCALE) - sprite_bmp->w) / 2;
+		x = ((256 * GFX_SCALE) - sprites[sprite_no].w) / 2;
 	
-	draw_sprite (gfx_screen, sprite_bmp, x + GFX_X_OFFSET, y + GFX_Y_OFFSET);
-#endif
+	//draw_sprite (gfx_screen, sprite_bmp, x + GFX_X_OFFSET, y + GFX_Y_OFFSET);
+	SDL_Rect rect;
+	rect.x = x + GFX_X_OFFSET;
+	rect.y = y + GFX_Y_OFFSET;
+	rect.w = sprites[sprite_no].w;
+	rect.h = sprites[sprite_no].h;
+
+	SDL_RenderCopy(sdl_ren, sprites[sprite_no].tex, NULL, &rect);
 }
 
 

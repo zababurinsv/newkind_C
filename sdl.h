@@ -111,6 +111,7 @@
 
 #define GFX_COL_PINK_1		183
 
+#define IMG_THE_SCANNER		0
 #define IMG_GREEN_DOT		1
 #define IMG_RED_DOT		2
 #define IMG_BIG_S		3
@@ -121,6 +122,7 @@
 #define IMG_MISSILE_YELLOW	8
 #define IMG_MISSILE_RED		9
 #define IMG_BLAKE		10
+#define IMG_NUM_OF		11
 
 
 extern int  sdl_last_key_pressed;
