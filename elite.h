@@ -12,12 +12,11 @@
  *
  */
 
-#ifndef ELITE_H
-#define ELITE_H
+#ifndef ETNK_ELITE_H
+#define ETNK_ELITE_H
 
 #include "planet.h"
 #include "trade.h"
-
 
 #define SCR_INTRO_ONE		1
 #define SCR_INTRO_TWO		2
@@ -33,10 +32,10 @@
 #define SCR_BREAK_PATTERN	12
 #define SCR_INVENTORY		13
 #define SCR_EQUIP_SHIP		14
-#define SCR_OPTIONS			15
+#define SCR_OPTIONS		15
 #define SCR_LOAD_CMDR		16
 #define SCR_SAVE_CMDR		17
-#define SCR_QUIT			18
+#define SCR_QUIT		18
 #define SCR_GAME_OVER		19
 #define SCR_SETTINGS		20
 #define SCR_ESCAPE_POD		21
@@ -44,26 +43,26 @@
 
 #define PULSE_LASER		0x0F
 #define BEAM_LASER		0x8F
-#define MILITARY_LASER	0x97
-#define MINING_LASER	0x32
+#define MILITARY_LASER		0x97
+#define MINING_LASER		0x32
 
 
-#define FLG_DEAD			(1)
-#define	FLG_REMOVE			(2)
+#define FLG_DEAD		(1)
+#define	FLG_REMOVE		(2)
 #define FLG_EXPLOSION		(4)
-#define FLG_ANGRY			(8)
-#define FLG_FIRING			(16)
-#define FLG_HAS_ECM			(32)
-#define FLG_HOSTILE			(64)
-#define FLG_CLOAKED			(128)
+#define FLG_ANGRY		(8)
+#define FLG_FIRING		(16)
+#define FLG_HAS_ECM		(32)
+#define FLG_HOSTILE		(64)
+#define FLG_CLOAKED		(128)
 #define FLG_FLY_TO_PLANET	(256)
 #define FLG_FLY_TO_STATION	(512)
 #define FLG_INACTIVE		(1024)
-#define FLG_SLOW			(2048)
-#define FLG_BOLD			(4096)
-#define FLG_POLICE			(8192)
-#define FLG_TACTICAL			(16384)
-#define FLG_TARGET			(32768)
+#define FLG_SLOW		(2048)
+#define FLG_BOLD		(4096)
+#define FLG_POLICE		(8192)
+#define FLG_TACTICAL		(16384)
+#define FLG_TARGET		(32768)
 
 #define MAX_UNIV_OBJECTS	20
 
@@ -78,7 +77,7 @@ struct commander
 	int credits;
 	int fuel;
 	int unused1;
-	int	galaxy_number;
+	int galaxy_number;
 	int front_laser;
 	int rear_laser;
 	int left_laser;
@@ -149,7 +148,7 @@ extern int zoom_x, zoom_y;
 
 extern int condition;
 enum {
-  COND_DOCKED, COND_GREEN, COND_YELLOW, COND_RED, COND_ALERT
+	COND_DOCKED, COND_GREEN, COND_YELLOW, COND_RED, COND_ALERT
 };
 
 extern int planet_render_style;
@@ -175,6 +174,5 @@ extern int remap_keys;
 extern int scanner_zoom;
 
 void restore_saved_commander (void);
-
 
 #endif

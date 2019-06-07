@@ -16,8 +16,8 @@
  * trade.h
  */
 
-#ifndef TRADE_H
-#define TRADE_H
+#ifndef ETNK_TRADE_H
+#define ETNK_TRADE_H
  
 struct stock_item
 {
@@ -44,4 +44,3 @@ int total_cargo (void);
 void scoop_item (int un);
 
 #endif
-

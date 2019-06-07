@@ -1,3 +1,4 @@
+#include "etnk.h"
 #include "shipdata.h" 
 
 

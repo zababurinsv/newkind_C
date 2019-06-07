@@ -12,8 +12,8 @@
  *
  */
 
-#ifndef SWAT_H
-#define SWAT_H
+#ifndef ETNK_SWAT_H
+#define ETNK_SWAT_H
 
 #include "space.h"
 

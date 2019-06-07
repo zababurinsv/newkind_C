@@ -15,8 +15,63 @@
  * Code to handle keyboard input.
  */
 
-#ifndef KEYBOARD_H
-#define KEYBOARD_H
+#ifndef ETNK_KEYBOARD_H
+#define ETNK_KEYBOARD_H
+
+
+#define KEY_0 1
+#define KEY_a 2
+#define KEY_A 3
+#define KEY_BACKSPACE 4
+#define KEY_c 5
+#define KEY_COMMA 6
+#define KEY_d 7
+#define KEY_DOWN 8
+#define KEY_e 9
+#define KEY_ESCAPE 10
+#define KEY_f 11
+#define KEY_F1 12
+#define KEY_F10 13
+#define KEY_F11 14
+#define KEY_F12 15
+#define KEY_F2 16
+#define KEY_F3 17
+#define KEY_F4 18
+#define KEY_F5 19
+#define KEY_F6 20
+#define KEY_F7 21
+#define KEY_F8 22
+#define KEY_F9 23
+#define KEY_h 24
+#define KEY_i 25
+#define KEY_j 26
+#define KEY_LCTRL 27
+#define KEY_LEFT 28
+#define KEY_m 29
+#define KEY_n 30
+#define KEY_o 31
+#define KEY_p 32
+#define KEY_r 33
+#define KEY_RCTRL 34
+#define KEY_RETURN 35
+#define KEY_RIGHT 36
+#define KEY_s 37
+#define KEY_SLASH 38
+#define KEY_SPACE 39
+#define KEY_STOP 40
+#define KEY_t 41
+#define KEY_TAB 42
+#define KEY_u 43
+#define KEY_UP 44
+#define KEY_x 45
+#define KEY_y 46
+#define KEY_z 47
+#define KEY_MAX 48
+
+extern char key[KEY_MAX];
+extern int  sdl_last_pressed_key;
+
+extern int readkey ( void );
  
 extern int kbd_F1_pressed;
 extern int kbd_F2_pressed;
@@ -69,4 +124,3 @@ int kbd_read_key (void);
 void kbd_clear_key_buffer (void);
 
 #endif
- 

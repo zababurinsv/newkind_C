@@ -4,4 +4,12 @@ a.out
 *.o
 *.exe
 *.depend
+*.pyc
+*.pyo
+*.dll
 newkind
+newkind.exe
+unpack/
+test.c
+.vscode/
+datafilebank.c

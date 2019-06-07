@@ -18,12 +18,13 @@
  * Code to handle the special missions.
  */
 
+#include "etnk.h"
+
 #include <stdlib.h>
 #include <string.h>
  
-#include "config.h"
 #include "elite.h"
-#include "gfx.h"
+#include "sdl.h"
 #include "vector.h"
 #include "space.h"
 #include "planet.h"
@@ -353,4 +354,3 @@ void check_mission_brief (void)
 		return;
 	}
 }
-

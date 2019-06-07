@@ -12,8 +12,8 @@
  *
  */
 
-#ifndef SHIPFACE_H
-#define SHIPFACE_H
+#ifndef ETNK_SHIPFACE_H
+#define ETNK_SHIPFACE_H
 
 struct ship_face
 {

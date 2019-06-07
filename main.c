@@ -13,11 +13,12 @@
  */
 
 /*
- * alg_main.c
+ * main.c
  *
- * Allegro version of the main game handler.
+ * Main game handler.
  */
 
+#include "etnk.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -26,13 +27,9 @@
 #include <time.h>
 #include <stdlib.h>
 
-#include "allegro.h"
-
-#include "config.h"
-#include "gfx.h"
+#include "sdl.h"
 #include "main.h"
 #include "vector.h"
-#include "alg_data.h"
 #include "elite.h"
 #include "docked.h"
 #include "intro.h"
@@ -52,6 +49,7 @@
 
 
 
+
 int old_cross_x, old_cross_y;
 int cross_timer;
 
@@ -62,7 +60,6 @@ char message_string[80];
 int rolling;
 int climbing;
 int game_paused;
-int have_joystick;
 #ifdef HACKING
 int identify;
 #endif
@@ -172,6 +169,9 @@ void move_cross (int dx, int dy)
 /*
  * Draw the cross hairs at the specified position.
  */
+
+// FIXME: no xor_mode ...
+#define xor_mode(shit)
 
 void draw_cross (int cx, int cy)
 {
@@ -754,13 +754,13 @@ static void check_cheat_keys(void)
     }
   }
 
-  if (old_key[KEY_C] == 1)
+  if (old_key[KEY_c] == 1)
     goto done;
 
   if (docked)
     return;
 
-  if (old_key[KEY_S] == 1) {
+  if (old_key[KEY_s] == 1) {
     if (cheat_arg < NO_OF_SHIPS) {
       int un = create_other_ship(cheat_arg);
       if (un != -1)
@@ -769,7 +769,7 @@ static void check_cheat_keys(void)
     }
   }
 
-  if (old_key[KEY_D] == 1) {
+  if (old_key[KEY_d] == 1) {
     game_paused = 0;
     snd_play_sample (SND_DOCK);					
     dock_player();
@@ -798,6 +798,8 @@ void handle_flight_keys (void)
 
 	kbd_poll_keyboard();
 
+	// FIXME: no joy yet ...
+#if 0
 	if (have_joystick)
 	{	
 		poll_joystick();	
@@ -823,6 +825,7 @@ void handle_flight_keys (void)
 		if (joy[0].button[2].b)
 			kbd_dec_speed_pressed = 1;
 	}
+#endif
 
 	
 	if (game_paused)
@@ -1097,6 +1100,18 @@ void handle_flight_keys (void)
 }
 
 
+static char *get_filename ( const char *path )
+{
+	const char *p = path;
+	while (*path) {
+		if (*path == '/' || *path == '\\')
+			p = path + 1;
+		path++;
+	}
+	return (char*)p;
+}
+
+
 
 void set_commander_name (char *path)
 {
@@ -1201,7 +1216,8 @@ void run_first_intro_screen (void)
 {
 	current_screen = SCR_INTRO_ONE;
 
-	snd_play_midi (SND_ELITE_THEME, TRUE);
+	//snd_play_midi (SND_ELITE_THEME, TRUE);
+	//FIXME: no midi
 
 	initialise_intro1();
 #ifdef HACKING
@@ -1238,7 +1254,8 @@ void run_second_intro_screen (void)
 {
 	current_screen = SCR_INTRO_TWO;
 	
-	snd_play_midi (SND_BLUE_DANUBE, TRUE);
+	//snd_play_midi (SND_BLUE_DANUBE, TRUE);
+	//FIXME: no midi
 
 #ifdef HACKING
 	identify = 0;
@@ -1355,30 +1372,10 @@ void info_message (char *message)
 }
 
 
-
-
-
-
-void initialise_allegro (void)
+int main ( int argc, char *argv[] )
 {
-	allegro_init();
-	install_keyboard(); 
-	install_timer();
-	install_mouse();
-
-	have_joystick = 0;
-	
-	if (install_joystick(JOY_TYPE_AUTODETECT) == 0)
-	{
-		have_joystick = (num_joysticks > 0);
-	}
-}
-
-
-
-int main()
-{
-	initialise_allegro();
+	if (init_sdl())
+		return 1;
 	read_config_file();
 
 	if (gfx_graphics_startup() == 1)
@@ -1415,7 +1412,7 @@ int main()
 		
 		while (!game_over)
 		{
-			snd_update_sound();
+			//snd_update_sound();
 			gfx_update_screen();
 			gfx_set_clip_region (1, 1, 510, 383);
 
@@ -1563,11 +1560,5 @@ int main()
 			run_game_over_screen();
 	}
 
-	snd_sound_shutdown();
-	
-	gfx_graphics_shutdown ();
-	
 	return 0;
 }
-
-END_OF_MAIN();

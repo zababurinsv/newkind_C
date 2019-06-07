@@ -18,6 +18,8 @@
  * This module handles all the flight system and management of the space universe.
  */
 
+#include "etnk.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
@@ -25,12 +27,9 @@
 
 #include "vector.h"
 
-#include "alg_data.h"
-
-#include "config.h"
 #include "elite.h"
 #include "keyboard.h"
-#include "gfx.h"
+#include "sdl.h"
 #include "docked.h"
 #include "intro.h"
 #include "shipdata.h"
@@ -589,7 +588,7 @@ void update_universe (void)
 		
 		if (type != 0)
 		{
-			if (universe[i].flags & FLG_REMOVE)
+			if ((universe[i].flags & FLG_REMOVE) && type > 0)
 			{
 				if (!(universe[i].flags & FLG_TARGET))
 					cmdr.legal_status |= 64;
@@ -738,7 +737,7 @@ void update_scanner (void)
 				colour = 252;
 				break;
 		}
-			
+
 		gfx_draw_colour_line (x1+2, y2,   x1-3, y2, colour);
 		gfx_draw_colour_line (x1+2, y2+1, x1-3, y2+1, colour);
 		gfx_draw_colour_line (x1+2, y2+2, x1-3, y2+2, colour);

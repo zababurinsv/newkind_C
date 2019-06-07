@@ -16,13 +16,14 @@
  * Handle the generation of planet info...
  */
 
+#include "etnk.h"
+
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 
-#include "config.h"
-#include "gfx.h"
+#include "sdl.h"
 #include "elite.h"
 #include "planet.h"
 #include "missions.h"
@@ -505,6 +506,3 @@ void generate_planet_data (struct planet_data *pl, struct galaxy_seed planet_see
 
 	pl->radius = (((planet_seed.f & 15) + 11) * 256) + planet_seed.d;
 }
-
-
-

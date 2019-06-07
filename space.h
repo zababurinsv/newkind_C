@@ -15,8 +15,8 @@
  * space.h
  */
 
-#ifndef SPACE_H
-#define SPACE_H
+#ifndef ETNK_SPACE_H
+#define ETNK_SPACE_H
 
 #include "vector.h"
 #include "shipdata.h"
@@ -91,4 +91,3 @@ void display_condition(void);
 void update_condition(void);
 
 #endif
-

@@ -16,8 +16,8 @@
  * options.h
  */
  
-#ifndef OPTIONS_H
-#define OPTIONS_H
+#ifndef ETNK_OPTIONS_H
+#define ETNK_OPTIONS_H
 
 void display_options (void);
 void select_previous_option (void);

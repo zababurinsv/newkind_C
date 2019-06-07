@@ -18,13 +18,14 @@
  * Special Weapons And Tactics.
  */
 
+#include "etnk.h"
+
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "config.h"
-#include "gfx.h"
+#include "sdl.h"
 #include "elite.h"
 #include "vector.h"
 #include "swat.h"
@@ -135,11 +136,17 @@ int add_new_ship (int ship_type, int x, int y, int z, struct vector *rotmat, int
 			
 			universe[i].flags = initial_flags[ship_type];
 
+			// suggested by TimSC - LGB.
 			if ((ship_type != SHIP_PLANET) && (ship_type != SHIP_SUN))
 			{
+				universe[i].flags = initial_flags[ship_type];
 				universe[i].energy = ship_list[ship_type]->energy;
 				universe[i].missiles = ship_list[ship_type]->missiles;
 				ship_count[ship_type]++;
+			} else {
+				universe[i].flags = 0;
+				universe[i].energy = 0;
+				universe[i].missiles = 0;
 			}
 			
 			return i;
@@ -1271,4 +1278,3 @@ void abandon_ship (void)
 	dock_player();
 	current_screen = SCR_BREAK_PATTERN;
 }
-

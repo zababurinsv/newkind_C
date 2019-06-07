@@ -12,9 +12,10 @@
  *
  */
 
+#include "etnk.h"
+
 #include <stdlib.h>
 
-#include "config.h"
 #include "elite.h"
 #include "vector.h"
 #include "planet.h"
@@ -66,40 +67,80 @@ int zoom_x, zoom_y;
 
 int condition = COND_DOCKED;
 
+#define DEVEL_CHEATING
+
+
+#ifdef DEVEL_CHEATING
 struct commander saved_cmdr =
 {
-	"JAMESON",									/* Name 			*/
-	0,											/* Mission Number 	*/
-	0x14,0xAD,									/* Ship X,Y			*/
+	"JAMESON",					/* Name 		*/
+	0,						/* Mission Number 	*/
+	0x14,0xAD,					/* Ship X,Y		*/
 	{0x4a, 0x5a, 0x48, 0x02, 0x53, 0xb7},		/* Galaxy Seed		*/
-	1000,										/* Credits * 10		*/
-	70,											/* Fuel	* 10		*/
+	1000000000,					/* Credits * 10		*/
+	70,						/* Fuel	* 10		*/
 	0,
-	0,											/* Galaxy - 1		*/
-	PULSE_LASER,								/* Front Laser		*/
-	0,											/* Rear Laser		*/
-	0,											/* Left Laser		*/
-	0,											/* Right Laser		*/
+	0,						/* Galaxy - 1		*/
+	MILITARY_LASER,					/* Front Laser		*/
+	MILITARY_LASER,					/* Rear Laser		*/
+	MILITARY_LASER,					/* Left Laser		*/
+	MILITARY_LASER,					/* Right Laser		*/
 	0, 0,
-	20,											/* Cargo Capacity	*/
+	20,						/* Cargo Capacity	*/
 	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},		/* Current Cargo	*/
-	0,											/* ECM				*/
-	0,											/* Fuel Scoop		*/
-	0,											/* Energy Bomb		*/
-	0,											/* Energy Unit		*/
-	0,											/* Docking Computer */
-	0,											/* Galactic H'Drive	*/
-	0,											/* Escape Pod		*/
+	1,						/* ECM			*/
+	1,						/* Fuel Scoop		*/
+	1,						/* Energy Bomb		*/
+	1,						/* Energy Unit		*/
+	1,						/* Docking Computer	*/
+	1,						/* Galactic H'Drive	*/
+	0,						/* Escape Pod		*/
 	0,0,0,0,
-	3,											/* No. of Missiles	*/
-	0,											/* Legal Status		*/
+	13,						/* No. of Missiles	*/
+	0,						/* Legal Status		*/
 	{0x10, 0x0F, 0x11, 0x00, 0x03, 0x1C,		/* Station Stock	*/
 	 0x0E, 0x00, 0x00, 0x0A, 0x00, 0x11,
 	 0x3A, 0x07, 0x09, 0x08, 0x00},
-	0,											/* Fluctuation		*/
-	0,											/* Score			*/
-	0x80										/* Saved			*/
+	0,						/* Fluctuation		*/
+	0x1900,						/* Score		*/
+	0x80						/* Saved		*/
 };
+#else
+struct commander saved_cmdr =
+{
+	"JAMESON",					/* Name 		*/
+	0,						/* Mission Number 	*/
+	0x14,0xAD,					/* Ship X,Y		*/
+	{0x4a, 0x5a, 0x48, 0x02, 0x53, 0xb7},		/* Galaxy Seed		*/
+	1000,						/* Credits * 10		*/
+	70,						/* Fuel	* 10		*/
+	0,
+	0,						/* Galaxy - 1		*/
+	PULSE_LASER,					/* Front Laser		*/
+	0,						/* Rear Laser		*/
+	0,						/* Left Laser		*/
+	0,						/* Right Laser		*/
+	0, 0,
+	20,						/* Cargo Capacity	*/
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},		/* Current Cargo	*/
+	0,						/* ECM			*/
+	0,						/* Fuel Scoop		*/
+	0,						/* Energy Bomb		*/
+	0,						/* Energy Unit		*/
+	0,						/* Docking Computer	*/
+	0,						/* Galactic H'Drive	*/
+	0,						/* Escape Pod		*/
+	0,0,0,0,
+	3,						/* No. of Missiles	*/
+	0,						/* Legal Status		*/
+	{0x10, 0x0F, 0x11, 0x00, 0x03, 0x1C,		/* Station Stock	*/
+	 0x0E, 0x00, 0x00, 0x0A, 0x00, 0x11,
+	 0x3A, 0x07, 0x09, 0x08, 0x00},
+	0,						/* Fluctuation		*/
+	0,						/* Score		*/
+	0x80						/* Saved		*/
+};
+#endif
 
 struct commander cmdr;
 
@@ -157,4 +198,3 @@ void restore_saved_commander (void)
 	generate_stock_market ();
 	set_stock_quantities (cmdr.station_stock);
 }
-

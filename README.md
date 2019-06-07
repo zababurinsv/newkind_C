@@ -7,6 +7,19 @@ The source has been forked to have some fun by me (LGB):
 
 Please refer the links above to learn more.
 
+Modifications done or planned by me so far:
+
+* Port to SDL2 (work-in-progress)
+* Windows / Linux / OSX build possible (work-in-progress)
+* Emscripten version (eg: play on the web browser) (work-in-progress)
+* Bug-fixes (work-in-progress)
+* Optional visual enhancements (work-in-progress)
+* In-game setting for visuals, possible other configurations (work-in-progress)
+* Import C64 SID emulation for sound effects instead of using WAVs (feels more authentic)
+* Import OPL2 emulation for music instead of using MIDs OR use SID (feels more authentic)
+* Embed all assets into the binary instead of external data and/or indvidual files laying around
+* Configuraton is stored in the user app directory given by SDL2
+
 The more or less original readme.txt follows ...
 
 ## Elite - The New Kind - Release 1.0

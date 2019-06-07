@@ -12,6 +12,7 @@
  *
  */
 
+#include "etnk.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -19,8 +20,7 @@
 #include <math.h>
 #include <ctype.h>
 
-#include "config.h"
-#include "gfx.h"
+#include "sdl.h"
 #include "elite.h"
 #include "planet.h"
 #include "shipdata.h"

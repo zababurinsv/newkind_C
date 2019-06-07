@@ -16,13 +16,14 @@
  * file.c
  */
 
+#include "etnk.h"
+
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "elite.h"
-#include "config.h"
 #include "file.h"
 
 void write_config_file (void)
@@ -339,7 +340,3 @@ int load_commander_file (char *path)
 
 	return 0;
 }
-
-
-
-

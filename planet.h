@@ -12,8 +12,8 @@
  *
  */
 
-#ifndef PLANET_H
-#define PLANET_H
+#ifndef ETNK_PLANET_H
+#define ETNK_PLANET_H
 
 
 struct galaxy_seed
@@ -52,4 +52,3 @@ void generate_planet_data (struct planet_data *pl, struct galaxy_seed planet_see
 void set_current_planet (struct galaxy_seed new_planet);
 
 #endif
-
