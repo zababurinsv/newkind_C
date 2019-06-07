@@ -22,10 +22,11 @@
 
 #include <stdlib.h>
 #include "sound.h"
-#include "alg_data.h" 
 #include "sdl.h"
 
-#define NUM_SAMPLES 14 
+#define NUM_SAMPLES 14
+
+#define SILENCE	0x80
 
 
 static const char *sample_filenames[NUM_SAMPLES] = {
@@ -47,22 +48,26 @@ static void audio_callback ( void *userdata, Uint8 *stream, int len )
 {
 	static const Uint8 *playing_pos = NULL;
 	static const Uint8 *playing_end = NULL;
-	if (play_sfx_request >= 0 && play_sfx_request < NUM_SAMPLES) {
+	if (ETNK_UNLIKELY(play_sfx_request >= 0 && play_sfx_request < NUM_SAMPLES && sample_p[play_sfx_request])) {
 		printf("AUDIO: start to playing sample #%d\n", play_sfx_request);
 		playing_pos = sample_p[play_sfx_request] + 44;	// really lame, we use WAVs as is, without even checking header or anything and assuming that it will work. wow. :-O
 		playing_end = sample_p[play_sfx_request] + sample_s[play_sfx_request];
 		play_sfx_request = -1;
 	}
-	for (int i = 0; i < len; i++) {
-		if (playing_pos) {
-			stream[i] = *playing_pos;
-			playing_pos++;
-			if (playing_pos >= playing_end) {
-				playing_pos = NULL;
-				puts("AUDIO: end of sample");
+	if (!playing_pos) {
+		memset(stream, SILENCE, len);
+	} else {
+		for (int i = 0; i < len; i++) {
+			if (playing_pos) {
+				stream[i] = *playing_pos;
+				playing_pos++;
+				if (playing_pos >= playing_end) {
+					playing_pos = NULL;
+					puts("AUDIO: end of sample");
+				}
+			} else {
+				stream[i] = SILENCE;
 			}
-		} else {
-			stream[i] = 0;
 		}
 	}
 }

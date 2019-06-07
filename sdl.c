@@ -26,7 +26,6 @@
 #include "SDL2_gfxPrimitives.h"
 
 #include "sdl.h"
-#include "alg_data.h"
 #include "elite.h"
 #include "keyboard.h"
 #include "datafile.h"
@@ -340,7 +339,7 @@ int gfx_graphics_startup (void)
 	//clear (gfx_screen);
 
 	//blit (scanner_image, gfx_screen, 0, 0, GFX_X_OFFSET, 385+GFX_Y_OFFSET, scanner_image->w, scanner_image->h);
-	sprites[IMG_THE_SCANNER].rect.x = GFX_X_OFFSET;
+	sprites[IMG_THE_SCANNER].rect.x = GFX_X_OFFSET;	// unlike other "sprites" the position is the same to put, always, so set it here ...
 	sprites[IMG_THE_SCANNER].rect.y = 385 + GFX_Y_OFFSET;
 	//scanner_rect.x = GFX_X_OFFSET;
 	//scanner_rect.y = 385+GFX_Y_OFFSET;
@@ -350,10 +349,12 @@ int gfx_graphics_startup (void)
 	//scanner_rect.h = scanner_texture->height;
 	//SDL_QueryTexture(scanner_texture,NULL,NULL,&scanner_rect.w,&scanner_rect.h);
 	//SDL_RenderCopy(sdl_ren, sprites[IMG_THE_SCANNER].tex, NULL, &scanner_rect);
-	gfx_draw_scanner();
+	//gfx_draw_scanner();
+	SDL_RenderCopy(sdl_ren, sprites[IMG_THE_SCANNER].tex, NULL, &sprites[IMG_THE_SCANNER].rect);	// render scanner without setting clipping (would be with gfx_draw_scanner ...)
 	gfx_draw_line (0, 0, 0, 384);
 	gfx_draw_line (0, 0, 511, 0);
 	gfx_draw_line (511, 0, 511, 384);
+	//gfx_draw_scanner();
 
 
 #if 0
@@ -408,6 +409,8 @@ void gfx_update_screen (void)
 	SDL_SetRenderTarget(sdl_ren, sdl_tex);
 	//SDL_SetRenderDrawColor(sdl_ren,0,0,0,0xFF);
 	//SDL_RenderClear(sdl_ren);
+	// FIXME:
+	// more sane framerate control
 	SDL_Delay(speed_cap);
 
 }
@@ -875,6 +878,10 @@ static ETNK_INLINE void set_clip ( int x1, int y1, int x2, int y2 )
 void gfx_draw_scanner (void)
 {
 	//fprintf(stderr, "FIXME: gfx_draw_scanner() is not implemented :(\n");
+	set_clip(/*gfx_screen,*/ GFX_X_OFFSET, 385 + GFX_Y_OFFSET,
+		 GFX_X_OFFSET + sprites[IMG_THE_SCANNER].rect.w,
+		 GFX_Y_OFFSET + sprites[IMG_THE_SCANNER].rect.h + 385);
+
 	SDL_RenderCopy(sdl_ren, sprites[IMG_THE_SCANNER].tex, NULL, &sprites[IMG_THE_SCANNER].rect);
 #if 0
 	set_clip(/*gfx_screen,*/ GFX_X_OFFSET, 385 + GFX_Y_OFFSET,

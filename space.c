@@ -27,8 +27,6 @@
 
 #include "vector.h"
 
-#include "alg_data.h"
-
 #include "elite.h"
 #include "keyboard.h"
 #include "sdl.h"
@@ -740,8 +738,6 @@ void update_scanner (void)
 				break;
 		}
 
-		printf("scanner: put stuff for type=%d colour=%d x=%d y1=%d y2=%d\n", universe[i].type, colour, x1, y1, y2);
-			
 		gfx_draw_colour_line (x1+2, y2,   x1-3, y2, colour);
 		gfx_draw_colour_line (x1+2, y2+1, x1-3, y2+1, colour);
 		gfx_draw_colour_line (x1+2, y2+2, x1-3, y2+2, colour);
@@ -776,7 +772,6 @@ void update_compass (void)
 	
 	compass_x = compass_centre_x + (dest.x * 16);
 	compass_y = compass_centre_y + (dest.y * -16);
-	printf("compass centre x=%d y=%d\n", compass_centre_x, compass_centre_y);
 	
 	if (dest.z < 0)
 	{
