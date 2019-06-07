@@ -13,9 +13,9 @@
  */
 
 /*
- * alg_main.c
+ * main.c
  *
- * Allegro version of the main game handler.
+ * Main game handler.
  */
 
 #include "etnk.h"
@@ -30,7 +30,6 @@
 #include "sdl.h"
 #include "main.h"
 #include "vector.h"
-#include "alg_data.h"
 #include "elite.h"
 #include "docked.h"
 #include "intro.h"
@@ -1373,7 +1372,7 @@ void info_message (char *message)
 }
 
 
-int main()
+int main ( int argc, char *argv[] )
 {
 	if (init_sdl())
 		return 1;
