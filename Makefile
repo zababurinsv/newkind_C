@@ -17,15 +17,15 @@ SDL_CFG_win32	= i686-w64-mingw32-sdl2-config
 DLL		= SDL2.dll
 DLL_SOURCE	= $(shell $(SDL_CFG_$(ARCH)) --prefix)/bin/$(DLL)
 
-CFLAGS_native	= -std=c99 -pipe -Ofast -ffast-math -fno-common -falign-functions=16 -falign-loops=16 -Wall -g -I. $(shell $(SDL_CFG_native) --cflags)
-#CFLAGS_native	= -std=c99 -pipe -O0 -fno-common -falign-functions=16 -falign-loops=16 -Wall -g -I. $(shell $(SDL_CFG_native) --cflags)
+CFLAGS_native	= -std=c99 -pipe -Ofast -ffast-math -fno-common -falign-functions=16 -falign-loops=16 -Wall -I. $(shell $(SDL_CFG_native) --cflags)
+#CFLAGS_native	= -g -std=c99 -pipe -O0 -fno-common -falign-functions=16 -falign-loops=16 -Wall -g -I. $(shell $(SDL_CFG_native) --cflags)
 CFLAGS_win64	= -std=c99 -pipe -Ofast -ffast-math -fno-common -falign-functions=16 -falign-loops=16 -Wall -I. $(shell $(SDL_CFG_win64) --cflags)
 CFLAGS_win32	= -std=c99 -pipe -Ofast -ffast-math -fno-common -falign-functions=16 -falign-loops=16 -Wall -I. $(shell $(SDL_CFG_win32) --cflags)
 CFLAGS		= $(CFLAGS_$(ARCH))
 
-LDFLAGS_native	= -g $(shell $(SDL_CFG_native) --libs) -lm
+LDFLAGS_native	= $(shell $(SDL_CFG_native) --libs) -lm
 LDFLAGS_win64	= $(shell $(SDL_CFG_win64) --libs)
-LDFALGS_win32	= $(shell $(SDL_CFG_win32) --libs)
+LDFLAGS_win32	= $(shell $(SDL_CFG_win32) --libs)
 LDFLAGS		= $(LDFLAGS_$(ARCH))
 
 EXE_native	= newkind
@@ -48,7 +48,8 @@ datafilebank.c: data/*
 $(DLL):
 	test -s $(DLL_SOURCE) && cp $(DLL_SOURCE) $(DLL) || true
 
-$(EXE): $(OBJS) $(DLL) $(ALLDEPS)
+$(EXE): $(OBJS) $(ALLDEPS)
+	$(MAKE) $(DLL) ARCH=$(ARCH)
 	$(CC) -o $@ $(OBJS) $(LDFLAGS)
 
 dep:	datafilebank.c
