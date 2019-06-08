@@ -114,14 +114,28 @@ SDL_RWops *datafile_open ( const char *fn )
 
 
 
+#define IS_IMG_EXTERNAL	0x100
+
 
 
 static void load_sprite ( int i, const char *fn, SDL_Surface **pass_surface_back )
 {
-	SDL_Surface *surface = SDL_LoadBMP_RW(datafile_open(fn), 1);
-	if (!surface) {
-		ERROR_WINDOW("Cannot load \"%s\": %s", fn, SDL_GetError());
-		exit(1);
+	SDL_Surface *surface;
+	if (i & IS_IMG_EXTERNAL) {
+		char path[PATH_MAX];
+		i &= ~IS_IMG_EXTERNAL;
+		sprintf(path, "%s%s", pref_path, fn);
+		surface = SDL_LoadBMP(path);
+		if (!surface) {
+			printf("SPRITE: cannot load sprite %s: %s\n", path, SDL_GetError());
+			return;
+		}
+	} else {
+		surface = SDL_LoadBMP_RW(datafile_open(fn), 1);
+		if (!surface) {
+			ERROR_WINDOW("Cannot load \"%s\": %s", fn, SDL_GetError());
+			exit(1);
+		}
 	}
 	sprites[i].tex = SDL_CreateTextureFromSurface(sdl_ren, surface);
 	if (!pass_surface_back)
@@ -281,8 +295,17 @@ int gfx_graphics_startup (void)
 	for (int a = 0; a < IMG_NUM_OF; a++)
 		sprites[a].tex = NULL;
 
-	SDL_Surface *surface;
-	load_sprite(IMG_THE_SCANNER,	"scanner.bmp",	&surface);
+	SDL_Surface *surface = NULL;
+	if (*scanner_filename) {
+		printf("SCANNER: trying to use %s as the scanner\n", scanner_filename);
+		load_sprite(IMG_THE_SCANNER | IS_IMG_EXTERNAL, scanner_filename, &surface);
+	} else {
+		puts("SCANNER: no external scanner was specified");
+	}
+	if (!surface) {
+		puts("SCANNER: defaulting to built-in scanner ...");
+		load_sprite(IMG_THE_SCANNER, "scanner.bmp",	&surface);
+	}
 	load_sprite(IMG_GREEN_DOT,	"greendot.bmp",	NULL);
 	load_sprite(IMG_RED_DOT,	"reddot.bmp",	NULL);
 	load_sprite(IMG_BIG_S,		"safe.bmp",	NULL);

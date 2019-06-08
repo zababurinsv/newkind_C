@@ -24,12 +24,14 @@ Modifications done or planned by me so far:
 
 You need SDL2 stuffs and basic devel stuffs, just say "make".
 
-### Build on Linux for Windows 32 or 64 bit (you can use that only on purely Windows, just the build needs Linux):
+### Build on Linux for Windows 32 or 64 bit (you can run it then only on purely Windows, just the build needs Linux):
 
 You need mingw compiler installed, and SDL2 for mingw, sdl2-config script symlinked to a place in your PATH with name you can
 see in Makefile. Then you need to say just "make ARCH=win32" for Windows 32 bit executable, or "make ARCH=win64"
 for Windows 64 execitable. In both cases, you can save the exe and dll file then. If you switch betwen architectures
 (ARCH) you may need "make clean" first or build fails.
+
+# The Original README, or such ...
 
 The more or less original readme.txt follows ...
 

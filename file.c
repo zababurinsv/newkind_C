@@ -22,6 +22,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
+#include <errno.h>
 
 #include "elite.h"
 #include "file.h"
@@ -32,6 +34,7 @@
 const char *pref_path;
 
 
+static const char *config_filename = "newkind.cfg";
 static const char *default_game_save_name = "default_save.eli";
 
 
@@ -48,7 +51,7 @@ void datafile_select ( const char *fn, const Uint8 **data_p, int *data_size )
 		}
 		offset += datafile_sizes[i];
 	}
-	fprintf(stderr, "DATAFILE: cannot find \"%s\" in the databank!", fn);
+	fprintf(stderr, "DATAFILE: cannot find \"%s\" in the databank!\n", fn);
 	exit(1);	// brutal ...
 }
 
@@ -62,6 +65,8 @@ static FILE *pref_fopen ( const char *name, const char *mode )
 	sprintf(path, "%s%s", pref_path, name);
 	FILE *f = fopen(path, mode);
 	printf("FILE: file \"%s\" open request with mode \"%s\" resulted in %s\n", path, mode, f ? "OK" : "ERROR");
+	if (!f)
+		perror("FILE: Cannot open file");
 	return f;
 }
 
@@ -70,7 +75,7 @@ void write_config_file (void)
 {
 	FILE *fp;
 	
-	fp = pref_fopen ("newkind.cfg", "w");
+	fp = pref_fopen (config_filename, "w");
 	if (fp == NULL)
 		return;
 
@@ -137,7 +142,7 @@ void read_cfg_line (char *str, int max_size, FILE *fp)
  * Read in the scanner .cfg file.
  */
 
-void read_scanner_config_file (char *filename)
+static void read_scanner_config_file (char *filename)
 {
 	FILE *fp;
 	char str[256];
@@ -177,9 +182,38 @@ void read_config_file (void)
 	FILE *fp;
 	char str[256];
 	
-	fp = pref_fopen ("newkind.cfg", "r");
+	// Just in case,apply some default values, if loading config don't work:
+	speed_cap		= 55; // was 75 originally?
+	wireframe		= 0;
+	anti_alias_gfx		= 1;
+	planet_render_style	= 3;
+	hoopy_casinos		= 0;
+	instant_dock		= 0;
+	prefer_window		= 1;
+	remap_keys		= 0;
+	// Defaults for the scanner (can be loaded in read_scanner_config_file() later to override)
+	scanner_filename[0]	= '\0';
+	scanner_cx		= 253;
+	scanner_cy		= 63;
+	compass_centre_x	= 382;
+	compass_centre_y	= 22;
+	condition_x		= 122;
+	condition_y		= 28;
+	condition_r		= 20;
+	zoom_x			= 133;
+	zoom_y			= 110;
+	scanner_cy += 385;
+	compass_centre_y += 385;
+	condition_y += 385;
+	zoom_y += 385;
+
+	fp = pref_fopen (config_filename, "r");
 	if (fp == NULL) {
-		write_config_file();	// write out some default file
+		if (errno == ENOENT) {
+			// write out some default file, if there wasn't yet (first time of starting the program):
+			puts("No configuration file, trying to create one default for you");
+			write_config_file();
+		}
 		return;
 	}
 

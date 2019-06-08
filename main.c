@@ -1376,12 +1376,11 @@ int main ( int argc, char *argv[] )
 {
 	if (init_sdl())
 		return 1;
+	/* Read configuration, it also applies default values, if no config can be read */
 	read_config_file();
 
-	if (gfx_graphics_startup() == 1)
-	{
+	if (gfx_graphics_startup())
 		return 1;
-	}
 	
 	/* Start the sound system... */
 	snd_sound_startup();

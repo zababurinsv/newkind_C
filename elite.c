@@ -34,20 +34,25 @@ int carry_flag = 0;
 int current_screen = 0;
 int witchspace;
 
-int wireframe = 0;
-int anti_alias_gfx = 0;
-int hoopy_casinos = 0;
-int speed_cap = 75;
-int instant_dock = 0;
+// These are set in file.c!
+int speed_cap;
+int wireframe;
+int anti_alias_gfx;
+int hoopy_casinos;
+int planet_render_style;
+int instant_dock;
+int prefer_window;
 
-
+// Again, these are set in file.c!
 char scanner_filename[256];
 int scanner_cx;
 int scanner_cy;
 int compass_centre_x;
 int compass_centre_y;
+int condition_x, condition_y, condition_r;
+int zoom_x, zoom_y;
 
-int planet_render_style = 3;
+
 
 int game_over;
 int docked;
@@ -61,9 +66,6 @@ int energy;
 int laser_temp;
 int detonate_bomb;
 int auto_pilot;
-int prefer_window;
-int condition_x, condition_y, condition_r;
-int zoom_x, zoom_y;
 
 int condition = COND_DOCKED;
 
