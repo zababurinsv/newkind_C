@@ -26,11 +26,51 @@
 #include "elite.h"
 #include "file.h"
 
+#include "datafile.h"
+
+
+const char *pref_path;
+
+
+static const char *default_game_save_name = "default_save.eli";
+
+
+// In-game datafile reference (ie, in the binary itself
+void datafile_select ( const char *fn, const Uint8 **data_p, int *data_size )
+{
+	int offset = 0;
+	for (int i = 0; datafile_filenames[i]; i++) {
+		if (!strcmp(fn, datafile_filenames[i])) {
+			*data_p = datafile_storage + offset;
+			*data_size = datafile_sizes[i];
+			printf("DATAFILE: selected=\"%s\", size=%d, offset=%d\n", fn, datafile_sizes[i], offset);
+			return;
+		}
+		offset += datafile_sizes[i];
+	}
+	fprintf(stderr, "DATAFILE: cannot find \"%s\" in the databank!", fn);
+	exit(1);	// brutal ...
+}
+
+
+
+static FILE *pref_fopen ( const char *name, const char *mode )
+{
+	if (!pref_path)
+		return NULL;
+	char path[PATH_MAX];
+	sprintf(path, "%s%s", pref_path, name);
+	FILE *f = fopen(path, mode);
+	printf("FILE: file \"%s\" open request with mode \"%s\" resulted in %s\n", path, mode, f ? "OK" : "ERROR");
+	return f;
+}
+
+
 void write_config_file (void)
 {
 	FILE *fp;
 	
-	fp = fopen ("newkind.cfg", "w");
+	fp = pref_fopen ("newkind.cfg", "w");
 	if (fp == NULL)
 		return;
 
@@ -102,7 +142,7 @@ void read_scanner_config_file (char *filename)
 	FILE *fp;
 	char str[256];
 	
-	fp = fopen (filename, "r");
+	fp = pref_fopen (filename, "r");
 	if (fp == NULL)
 		return;
 
@@ -137,9 +177,11 @@ void read_config_file (void)
 	FILE *fp;
 	char str[256];
 	
-	fp = fopen ("newkind.cfg", "r");
-	if (fp == NULL)
+	fp = pref_fopen ("newkind.cfg", "r");
+	if (fp == NULL) {
+		write_config_file();	// write out some default file
 		return;
+	}
 
 	read_cfg_line (str, sizeof(str), fp);
 	sscanf (str, "%d", &speed_cap);
@@ -190,14 +232,16 @@ int checksum (unsigned char *block)
 }
 
 
-int save_commander_file (char *path)
+int save_commander_file ( const char *path )
 {
 	FILE *fp;
 	unsigned char block[256];
 	int i;
 	int chk;
-	
-	fp = fopen (path, "wb");
+
+	if (!path || !*path)
+		path = default_game_save_name;
+	fp = pref_fopen (path, "wb");
 	if (fp == NULL)
 		return 1;
 	
@@ -268,14 +312,16 @@ int save_commander_file (char *path)
 }
 
 
-int load_commander_file (char *path)
+int load_commander_file ( const char *path )
 {
 	FILE *fp;
 	unsigned char block[256];
 	int i;
 	int chk;
 	
-	fp = fopen (path, "rb");
+	if (!path || !*path)
+		path = default_game_save_name;
+	fp = pref_fopen (path, "rb");
 	if (fp == NULL)
 		return 1;
 

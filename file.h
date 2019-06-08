@@ -19,9 +19,13 @@
 #ifndef ETNK_FILE_H
 #define ETNK_FILE_H
 
-void write_config_file (void);
-void read_config_file (void);
-int save_commander_file (char *path);
-int load_commander_file (char *path);
+extern const char *pref_path;
+
+extern void datafile_select ( const char *fn, const Uint8 **data_p, int *data_size );
+
+extern void write_config_file (void);
+extern void read_config_file (void);
+extern int  save_commander_file (const char *path);
+extern int  load_commander_file (const char *path);
 
 #endif

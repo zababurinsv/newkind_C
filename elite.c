@@ -47,7 +47,7 @@ int scanner_cy;
 int compass_centre_x;
 int compass_centre_y;
 
-int planet_render_style = 0;
+int planet_render_style = 3;
 
 int game_over;
 int docked;

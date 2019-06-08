@@ -22,7 +22,7 @@
 
 #include <stdlib.h>
 #include "sound.h"
-#include "sdl.h"
+#include "file.h"
 
 #define NUM_SAMPLES 14
 

@@ -130,9 +130,6 @@ extern int  sdl_last_key_pressed;
 extern int  init_sdl ( void );
 extern void handle_sdl_events ( void );
 
-
-extern void  datafile_select ( const char *fn, const Uint8 **data_p, int *data_size );
-
 extern int  gfx_graphics_startup (void);
 //extern void gfx_graphics_shutdown (void);
 extern void gfx_update_screen (void);

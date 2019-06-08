@@ -30,6 +30,7 @@
 #include "keyboard.h"
 #include "datafile.h"
 #include "sound.h"
+#include "file.h"
 
 static SDL_Texture	*sdl_tex = NULL;
 static SDL_Window	*sdl_win = NULL;
@@ -96,23 +97,6 @@ static struct {
 //	int w;
 //	int h;
 } sprites[IMG_NUM_OF];
-
-
-void datafile_select ( const char *fn, const Uint8 **data_p, int *data_size )
-{
-	int offset = 0;
-	for (int i = 0; datafile_filenames[i]; i++) {
-		if (!strcmp(fn, datafile_filenames[i])) {
-			*data_p = datafile_storage + offset;
-			*data_size = datafile_sizes[i];
-			printf("DATAFILE: selected=\"%s\", size=%d, offset=%d\n", fn, datafile_sizes[i], offset);
-			return;
-		}
-		offset += datafile_sizes[i];
-	}
-	ERROR_WINDOW("DATAFILE: cannot find \"%s\" in the databank!", fn);
-	exit(1);	// brutal ...
-}
 
 
 SDL_RWops *datafile_open ( const char *fn )
@@ -1086,6 +1070,11 @@ int init_sdl ( void )
 		return 1;
 	}
 	atexit(shutdown_sdl);
+	pref_path = SDL_GetPrefPath("lgb", "newkind");
+	if (!pref_path) {
+		ERROR_WINDOW("Cannot make use of pref path: %s", SDL_GetError());
+		return 1;
+	}
 	//SDL_StartTextInput();
 #if 0
 	allegro_init();
