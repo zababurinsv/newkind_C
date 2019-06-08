@@ -1348,6 +1348,7 @@ void display_break_pattern (void)
 	
 	for (i = 0; i < 20; i++)
 	{
+		gfx_set_clip_region (1, 1, 510, 383);	// put it here, to avoid overdraw console etc with circles when they are big enough
 		gfx_draw_circle (256, 192, 30 + i * 15, GFX_COL_WHITE);
 		gfx_update_screen();
 	}	
