@@ -1,0 +1,43 @@
+{
+  "name": "contract-deals",
+  "version": "1.0.0",
+  "description": "contract-deals",
+  "main": "server.mjs",
+  "directories": {
+    "doc": "contract-deals"
+  },
+  "type": "module",
+  "scripts": {
+    "__newkind":"echo name project New Kind",
+    "clean": "make clean",
+    "-desktop_":"echo name project New Kind",
+    "origin": "./index",
+    "start":"./newkind &",
+    "-wasm_":"echo name project New Kind",
+    "wasm": "./index.web",
+    "install": "make install",
+    "uninstall": "make uninstall",
+    "-git_":"echo name project New Kind",
+    "git": "git status && git add -A && git commit -am 'update' && git push",
+    "status": "git status",
+    "reset": "git clean -f"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zababurinsv/contract-deals.git"
+  },
+  "keywords": [
+    "game"
+  ],
+  "author": "Zababurin Sergey",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/zababurinsv/contract-deals/issues"
+  },
+  "homepage": "https://github.com/zababurinsv/contract-deals#readme",
+  "nodemonConfig": {
+    "ignore": [
+      "node_modules/*"
+    ]
+  }
+}
