@@ -58,7 +58,7 @@ $(DEPFILE): $(ALLDEPS) *.c *.h datafilebank.c
 	$(CC) -MM $(CFLAGS) $(SRCS) > $(DEPFILE)
 
 clean:
-	rm -rf $(EXE_native) *.js *.wasm *.html *.wasm.map *.data *.o
+	rm -rf $(EXE_native) *.js *.wasm *.html *.wasm.map *.data *.o *.depend
 
 distclean:
 	$(MAKE) clean ARCH=$(ARCH)
