@@ -9,18 +9,19 @@
   "type": "module",
   "scripts": {
     "__newkind__":"echo name project New Kind",
-    "clean": "make clean",
+    "newkind_clean": "make clean",
     "__desktop__":"echo name project New Kind",
-    "origin": "./index",
-    "start":"./newkind &",
+    "desktop_origin": "./index",
+    "desktop_start":"./newkind &",
     "__wasm__":"echo name project New Kind",
-    "wasm": "./index.web",
-    "install": "make install",
-    "uninstall": "make uninstall",
+    "wasm_run": "./index.web",
+    "wasm_install": "make install",
+    "wasm_uninstall": "make uninstall",
     "__git__":"echo name project New Kind",
     "git": "git status && git add -A && git commit -am 'update' && git push",
-    "status": "git status",
-    "reset": "git clean -f"
+    "git_status": "git status",
+    "git_clean": "git clean -f",
+    "git_reset": "git clean -f"
   },
   "repository": {
     "type": "git",
