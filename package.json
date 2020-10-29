@@ -20,6 +20,7 @@
     "__git__":"echo name project New Kind",
     "git": "git status && git add -A && git commit -am 'update' && git push",
     "git_status": "git status",
+    "git_pull": "git pull",
     "git_clean": "git clean -f",
     "git_reset": "git reset --hard"
   },

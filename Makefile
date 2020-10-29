@@ -64,7 +64,7 @@ $(DEPFILE): $(ALLDEPS) *.c *.h datafilebank.c
 	$(CC) -MM $(CFLAGS) $(SRCS) > $(DEPFILE)
 
 clean:
-	rm -f $(OBJS) $(EXE) $(DLL)
+	rm -rf $(EXE_native) *.js *.wasm *.html *.wasm.map *.data *.o
 
 distclean:
 	$(MAKE) clean ARCH=$(ARCH)
