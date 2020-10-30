@@ -7,5 +7,5 @@ make -f Makefile_html distclean
 emmake make -f Makefile_html \
 LDFLAGS_native="$FLAGS" \
 CC_native=emcc  \
-EXE_native=newkind.html \
+EXE_native=index.html \
 CFLAGS_native="$FLAGS"

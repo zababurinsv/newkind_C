@@ -21,7 +21,7 @@ DLL			= SDL2.dll
 DLL_SOURCE	= $(shell $(SDL_CFG_$(ARCH)) --prefix)/bin/$(DLL)
 DLL_HTML	= $(shell $(SDL_CFG_$(ARCH)) --prefix)/bin/$(DLL)
 
-CFLAGS_html		= -O1 -s GL_UNSAFE_OPTS=0 -s ERROR_ON_UNDEFINED_SYMBOLS=1  -s LEGACY_GL_EMULATION=0 -s USE_SDL=2 -s USE_SDL_TTF=2 -s USE_SDL_MIXER=2 -s USE_ZLIB=1 -s USE_SDL_GFX=2 --preload-file data/ -s ASYNCIFY=1
+CFLAGS_html		= -Os -s GL_UNSAFE_OPTS=0 -s ERROR_ON_UNDEFINED_SYMBOLS=1  -s LEGACY_GL_EMULATION=0 -s USE_SDL=2 -s USE_SDL_TTF=2 -s USE_SDL_MIXER=2 -s USE_ZLIB=1 -s USE_SDL_GFX=2 --preload-file data/ -s ASYNCIFY=1
 CFLAGS_native	= -std=c99 -pipe -Ofast -ffast-math -fno-common -falign-functions=16 -falign-loops=16 -Wall -I. $(shell $(SDL_CFG_native) --cflags)
 #CFLAGS_native	= -g -std=c99 -pipe -O0 -fno-common -falign-functions=16 -falign-loops=16 -Wall -g -I. $(shell $(SDL_CFG_native) --cflags)
 CFLAGS_win64	= -std=c99 -pipe -Ofast -ffast-math -fno-common -falign-functions=16 -falign-loops=16 -Wall -I. $(shell $(SDL_CFG_win64) --cflags)
