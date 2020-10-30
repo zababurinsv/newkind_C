@@ -1,3 +1,0 @@
-#!/bin/bash
-
-emcc -O0 -s USE_ZLIB=1 -s USE_SDL_GFX=2 -s USE_SDL=2 -s USE_SDL_TTF=2 -s USE_SDL_MIXER=2 --preload-file data/ -s ASYNCIFY=1 datafilebank.o SDL2_gfxPrimitives.o SDL2_rotozoom.o sdl.o main.o docked.o elite.o intro.o planet.o shipdata.o shipface.o sound.o space.o swat.o threed.o vector.o random.o trade.o options.o stars.o missions.o pilot.o file.o keyboard.o -o newkind.html

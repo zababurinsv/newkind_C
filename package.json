@@ -14,7 +14,7 @@
     "native": "./index",
     "desktop_start":"./newkind &",
     "__wasm__":"echo name project New Kind",
-    "wasm": "./index.web",
+    "wasm": "./index_html",
     "wasm_install": "make install",
     "wasm_uninstall": "make uninstall",
     "__git__":"echo name project New Kind",
