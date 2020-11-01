@@ -60,13 +60,12 @@ $(DEPFILE): $(ALLDEPS) *.c *.h datafilebank.c
 
 clean:
 	rm -f $(OBJS) $(EXE) $(DLL)
-	rm -rf $(EXE_native) *.js *.wasm *.html *.wasm.map *.data *.o *.depend
 
 distclean:
 	$(MAKE) clean ARCH=$(ARCH)
 	rm -f $(DEPFILE) *~ *.swp a.out datafilebank.c
 
-.PHONY: dep all clean distclean install uninstall
+.PHONY: dep all clean distclean
 
 ifneq ($(wildcard $(DEPFILE)),)
 include $(DEPFILE)
