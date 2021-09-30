@@ -1,5 +1,5 @@
 {
-  "name": "contract-deals",
+  "name": "@orbit/newkind",
   "version": "1.0.0",
   "description": "contract-deals",
   "main": "server.mjs",
