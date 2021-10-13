@@ -316,6 +316,9 @@ The following features have not yet been implemented but are being currently wor
   It didn't in the original Elite either.  Broken as designed.
 
 
+## npm packages
+* npm i @newkind/connect
+
 Have fun!
 
 Christian Pinder.
