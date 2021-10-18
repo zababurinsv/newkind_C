@@ -2,8 +2,9 @@
 
 The source has been forked to have some fun by me (LGB):
 
-* https://github.com/lgblgblgb/newkind
-* http://github.lgb.hu/newkind
+* https://github.com/lgblgblgb/newkind (C language)
+* http://github.lgb.hu/newkind (C language)
+* https://github.com/zababurinsv/newkind (WebAssembly language)
 
 Please refer the links above to learn more.
 
