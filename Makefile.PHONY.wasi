@@ -46,7 +46,7 @@ install:
 	rm -fr *.js *.o *.html *.wasm *.wasm.map ./*.data
 
 clean:
-	rm -fr *.js *.mjs *.o *.html *.wasm *.wasm.map *.depend *.data
+	rm -fr *.js *.mem *.mjs *.o *.html *.wasm *.wasm.map *.depend *.data
 
 ifneq ($(wildcard $(DEPFILE)),)
 include $(DEPFILE)
